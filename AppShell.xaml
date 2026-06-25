@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="RunWise.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:local="clr-namespace:RunWise"
+    Title="RunWise"
+    Shell.FlyoutBehavior="Disabled"
+    >
+
+    <FlyoutItem FlyoutDisplayOptions="AsMultipleItems">
+        <ShellContent
+        Title="Home"
+        ContentTemplate="{DataTemplate local:Pages.HomePage}"
+        Route="MainPage" />
+
+        <ShellContent
+        Title="Maps"
+        ContentTemplate="{DataTemplate local:Pages.MapPage}"
+        Route="MainPage" />
+
+        <ShellContent
+        Title="Run"
+        ContentTemplate="{DataTemplate local:Pages.RunPage}"
+        Route="MainPage" />
+
+        <ShellContent
+        Title="Profile"
+        ContentTemplate="{DataTemplate local:Pages.ProfilePage}"
+        Route="MainPage" />
+    </FlyoutItem>
+
+</Shell>
