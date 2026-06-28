@@ -3,10 +3,24 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RunWise.Pages.RunPage"
              Title="Run">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+    <Grid RowDefinitions="*, Auto">
+        <WebView x:Name="MapWebView" Grid.Row="0" />
+
+        <StackLayout Grid.Row="1" Orientation="Horizontal"
+                     BackgroundColor="#1e1e1e"
+                     Padding="12"
+                     Spacing="12"
+                     HorizontalOptions="Fill">
+            <VerticalStackLayout HorizontalOptions="StartAndExpand">
+                <Label x:Name="TimeLabel" Text="00:00:00" TextColor="White" FontSize="20" />
+                <Label x:Name="DistanceLabel" Text="Distance: 0.00 km" TextColor="White" FontSize="14" />
+            </VerticalStackLayout>
+
+            <HorizontalStackLayout HorizontalOptions="End" Spacing="8">
+                <Button x:Name="StartButton" Text="Start" Clicked="StartButton_Clicked" />
+                <Button x:Name="PauseButton" Text="Pause" Clicked="PauseButton_Clicked" IsEnabled="False" />
+                <Button x:Name="StopButton" Text="Stop" Clicked="StopButton_Clicked" IsEnabled="False" />
+            </HorizontalStackLayout>
+        </StackLayout>
+    </Grid>
 </ContentPage>

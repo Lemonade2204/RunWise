@@ -1,9 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "vT8j02ndBJA=",
+  "dgSpecHash": "m0cEn5nVtTY=",
   "success": true,
   "projectFilePath": "C:\\Users\\lemue\\source\\repos\\RunWise\\RunWise\\RunWise.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\lemue\\.nuget\\packages\\communitytoolkit.maui\\8.0.0\\communitytoolkit.maui.8.0.0.nupkg.sha512",
+    "C:\\Users\\lemue\\.nuget\\packages\\communitytoolkit.maui.core\\8.0.0\\communitytoolkit.maui.core.8.0.0.nupkg.sha512",
     "C:\\Users\\lemue\\.nuget\\packages\\communitytoolkit.mvvm\\8.4.2\\communitytoolkit.mvvm.8.4.2.nupkg.sha512",
     "C:\\Users\\lemue\\.nuget\\packages\\googlegson\\2.13.1.1\\googlegson.2.13.1.1.nupkg.sha512",
     "C:\\Users\\lemue\\.nuget\\packages\\microsoft.extensions.configuration\\10.0.0\\microsoft.extensions.configuration.10.0.0.nupkg.sha512",
@@ -22,6 +24,7 @@
     "C:\\Users\\lemue\\.nuget\\packages\\microsoft.io.recyclablememorystream\\3.0.1\\microsoft.io.recyclablememorystream.3.0.1.nupkg.sha512",
     "C:\\Users\\lemue\\.nuget\\packages\\microsoft.maui.controls\\10.0.20\\microsoft.maui.controls.10.0.20.nupkg.sha512",
     "C:\\Users\\lemue\\.nuget\\packages\\microsoft.maui.controls.build.tasks\\10.0.20\\microsoft.maui.controls.build.tasks.10.0.20.nupkg.sha512",
+    "C:\\Users\\lemue\\.nuget\\packages\\microsoft.maui.controls.compatibility\\8.0.14\\microsoft.maui.controls.compatibility.8.0.14.nupkg.sha512",
     "C:\\Users\\lemue\\.nuget\\packages\\microsoft.maui.controls.core\\10.0.20\\microsoft.maui.controls.core.10.0.20.nupkg.sha512",
     "C:\\Users\\lemue\\.nuget\\packages\\microsoft.maui.controls.xaml\\10.0.20\\microsoft.maui.controls.xaml.10.0.20.nupkg.sha512",
     "C:\\Users\\lemue\\.nuget\\packages\\microsoft.maui.core\\10.0.20\\microsoft.maui.core.10.0.20.nupkg.sha512",
@@ -33,6 +36,7 @@
     "C:\\Users\\lemue\\.nuget\\packages\\microsoft.web.webview2\\1.0.3179.45\\microsoft.web.webview2.1.0.3179.45.nupkg.sha512",
     "C:\\Users\\lemue\\.nuget\\packages\\microsoft.windows.sdk.buildtools\\10.0.22621.756\\microsoft.windows.sdk.buildtools.10.0.22621.756.nupkg.sha512",
     "C:\\Users\\lemue\\.nuget\\packages\\microsoft.windowsappsdk\\1.7.250909003\\microsoft.windowsappsdk.1.7.250909003.nupkg.sha512",
+    "C:\\Users\\lemue\\.nuget\\packages\\system.speech\\8.0.0\\system.speech.8.0.0.nupkg.sha512",
     "C:\\Users\\lemue\\.nuget\\packages\\xamarin.android.glide\\4.16.0.14\\xamarin.android.glide.4.16.0.14.nupkg.sha512",
     "C:\\Users\\lemue\\.nuget\\packages\\xamarin.android.glide.annotations\\4.16.0.14\\xamarin.android.glide.annotations.4.16.0.14.nupkg.sha512",
     "C:\\Users\\lemue\\.nuget\\packages\\xamarin.android.glide.disklrucache\\4.16.0.14\\xamarin.android.glide.disklrucache.4.16.0.14.nupkg.sha512",
