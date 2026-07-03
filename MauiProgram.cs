@@ -1,5 +1,6 @@
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
+using PdfSharpCore.Fonts;
 
 namespace RunWise
 {
@@ -7,6 +8,7 @@ namespace RunWise
     {
         public static MauiApp CreateMauiApp()
         {
+            GlobalFontSettings.FontResolver = new DummyFontResolver();
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()

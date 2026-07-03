@@ -25,9 +25,15 @@
         Route="MainPage" />
 
         <ShellContent
+        Title="History"
+        ContentTemplate="{DataTemplate local:Pages.HistoryPage}"
+        Route="history" />
+
+        <ShellContent
         Title="Profile"
         ContentTemplate="{DataTemplate local:Pages.ProfilePage}"
         Route="MainPage" />
     </FlyoutItem>
 
+    
 </Shell>

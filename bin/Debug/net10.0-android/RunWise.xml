@@ -4,6 +4,29 @@
         <name>RunWise</name>
     </assembly>
     <members>
+        <member name="T:RunWise.ViewModels.HistoryViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:RunWise.ViewModels.HistoryViewModel.RunHistory">
+            <inheritdoc cref="F:RunWise.ViewModels.HistoryViewModel.runHistory"/>
+        </member>
+        <member name="P:RunWise.ViewModels.HistoryViewModel.IsLoading">
+            <inheritdoc cref="F:RunWise.ViewModels.HistoryViewModel.isLoading"/>
+        </member>
+        <member name="F:RunWise.ViewModels.HistoryViewModel.loadHistoryCommand">
+            <summary>The backing field for <see cref="P:RunWise.ViewModels.HistoryViewModel.LoadHistoryCommand"/>.</summary>
+        </member>
+        <member name="P:RunWise.ViewModels.HistoryViewModel.LoadHistoryCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:RunWise.ViewModels.HistoryViewModel.LoadHistory"/>.</summary>
+        </member>
+        <member name="F:RunWise.ViewModels.HistoryViewModel.deleteRunCommand">
+            <summary>The backing field for <see cref="P:RunWise.ViewModels.HistoryViewModel.DeleteRunCommand"/>.</summary>
+        </member>
+        <member name="P:RunWise.ViewModels.HistoryViewModel.DeleteRunCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand`1"/> instance wrapping <see cref="M:RunWise.ViewModels.HistoryViewModel.DeleteRun(RunWise.Models.RunSession)"/>.</summary>
+        </member>
         <member name="T:RunWise.ViewModels.MapViewModel">
             <inheritdoc/>
         </member>
@@ -13,11 +36,74 @@
         <member name="P:RunWise.ViewModels.MapViewModel.MapLoaded">
             <inheritdoc cref="F:RunWise.ViewModels.MapViewModel._mapLoaded"/>
         </member>
+        <member name="T:RunWise.ViewModels.RunViewModel">
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+            <inheritdoc/>
+        </member>
+        <member name="P:RunWise.ViewModels.RunViewModel.ElapsedTime">
+            <inheritdoc cref="F:RunWise.ViewModels.RunViewModel.elapsedTime"/>
+        </member>
+        <member name="P:RunWise.ViewModels.RunViewModel.DistanceKm">
+            <inheritdoc cref="F:RunWise.ViewModels.RunViewModel.distanceKm"/>
+        </member>
+        <member name="P:RunWise.ViewModels.RunViewModel.CurrentPaceKmh">
+            <inheritdoc cref="F:RunWise.ViewModels.RunViewModel.currentPaceKmh"/>
+        </member>
+        <member name="P:RunWise.ViewModels.RunViewModel.IsTracking">
+            <inheritdoc cref="F:RunWise.ViewModels.RunViewModel.isTracking"/>
+        </member>
+        <member name="P:RunWise.ViewModels.RunViewModel.IsPaused">
+            <inheritdoc cref="F:RunWise.ViewModels.RunViewModel.isPaused"/>
+        </member>
+        <member name="P:RunWise.ViewModels.RunViewModel.RunHistory">
+            <inheritdoc cref="F:RunWise.ViewModels.RunViewModel.runHistory"/>
+        </member>
+        <member name="F:RunWise.ViewModels.RunViewModel.startTrackingCommand">
+            <summary>The backing field for <see cref="P:RunWise.ViewModels.RunViewModel.StartTrackingCommand"/>.</summary>
+        </member>
+        <member name="P:RunWise.ViewModels.RunViewModel.StartTrackingCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:RunWise.ViewModels.RunViewModel.StartTracking"/>.</summary>
+        </member>
+        <member name="F:RunWise.ViewModels.RunViewModel.pauseTrackingCommand">
+            <summary>The backing field for <see cref="P:RunWise.ViewModels.RunViewModel.PauseTrackingCommand"/>.</summary>
+        </member>
+        <member name="P:RunWise.ViewModels.RunViewModel.PauseTrackingCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:RunWise.ViewModels.RunViewModel.PauseTracking"/>.</summary>
+        </member>
+        <member name="F:RunWise.ViewModels.RunViewModel.stopTrackingCommand">
+            <summary>The backing field for <see cref="P:RunWise.ViewModels.RunViewModel.StopTrackingCommand"/>.</summary>
+        </member>
+        <member name="P:RunWise.ViewModels.RunViewModel.StopTrackingCommand">
+            <summary>Gets an <see cref="T:CommunityToolkit.Mvvm.Input.IAsyncRelayCommand"/> instance wrapping <see cref="M:RunWise.ViewModels.RunViewModel.StopTracking"/>.</summary>
+        </member>
         <member name="T:RunWise.Resource">
             <summary>
             Android Resource Designer class.
             Exposes the Android Resource designer assembly into the project Namespace.
             </summary>
+        </member>
+        <member name="T:HomeViewModel">
+            <inheritdoc/>
+        </member>
+        <member name="P:HomeViewModel.RecentRunDate">
+            <inheritdoc cref="F:HomeViewModel.recentRunDate"/>
+        </member>
+        <member name="P:HomeViewModel.RecentDistance">
+            <inheritdoc cref="F:HomeViewModel.recentDistance"/>
+        </member>
+        <member name="P:HomeViewModel.RecentDuration">
+            <inheritdoc cref="F:HomeViewModel.recentDuration"/>
+        </member>
+        <member name="P:HomeViewModel.RecentAvgPace">
+            <inheritdoc cref="F:HomeViewModel.recentAvgPace"/>
+        </member>
+        <member name="P:HomeViewModel.HasRecentRun">
+            <inheritdoc cref="F:HomeViewModel.hasRecentRun"/>
+        </member>
+        <member name="P:HomeViewModel.NoRuns">
+            <inheritdoc cref="F:HomeViewModel.noRuns"/>
         </member>
         <member name="M:Microsoft.Maui.Controls.ColorAnimationExtensions_Button.TextColorTo(Microsoft.Maui.Controls.Button,Microsoft.Maui.Graphics.Color,System.UInt32,System.UInt32,Microsoft.Maui.Easing,System.Threading.CancellationToken)">
             <summary>
@@ -145,11 +231,50 @@
             for all properties generated with <see cref="T:CommunityToolkit.Mvvm.ComponentModel.ObservablePropertyAttribute"/>.
             </summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.RunHistory">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "RunHistory" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsLoading">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsLoading" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.RecentRunDate">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "RecentRunDate" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.RecentDistance">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "RecentDistance" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.RecentDuration">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "RecentDuration" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.RecentAvgPace">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "RecentAvgPace" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.HasRecentRun">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "HasRecentRun" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.NoRuns">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "NoRuns" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsListening">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsListening" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.MapLoaded">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "MapLoaded" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.ElapsedTime">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "ElapsedTime" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.DistanceKm">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "DistanceKm" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.CurrentPaceKmh">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "CurrentPaceKmh" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsTracking">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsTracking" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.IsPaused">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "IsPaused" generated properties.</summary>
         </member>
         <member name="T:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs">
             <summary>
@@ -157,11 +282,50 @@
             for all properties generated with <see cref="T:CommunityToolkit.Mvvm.ComponentModel.ObservablePropertyAttribute"/>.
             </summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.RunHistory">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "RunHistory" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsLoading">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsLoading" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.RecentRunDate">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "RecentRunDate" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.RecentDistance">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "RecentDistance" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.RecentDuration">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "RecentDuration" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.RecentAvgPace">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "RecentAvgPace" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.HasRecentRun">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "HasRecentRun" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.NoRuns">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "NoRuns" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsListening">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsListening" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.MapLoaded">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "MapLoaded" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.ElapsedTime">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "ElapsedTime" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.DistanceKm">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "DistanceKm" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.CurrentPaceKmh">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "CurrentPaceKmh" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsTracking">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsTracking" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.IsPaused">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "IsPaused" generated properties.</summary>
         </member>
     </members>
 </doc>

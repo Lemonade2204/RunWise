@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:RunWise.ViewModels"
+             x:Class="RunWise.Pages.HistoryPage"
+             x:Name="ThisPage"
+             Title="Run History">
+
+    <ContentPage.BindingContext>
+        <vm:HistoryViewModel/>
+    </ContentPage.BindingContext>
+
+    <Grid RowDefinitions="*">
+
+        <!-- Loading -->
+        <ActivityIndicator IsRunning="{Binding IsLoading}"
+                           IsVisible="{Binding IsLoading}"
+                           Color="#00C853"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Center"/>
+
+        <CollectionView ItemsSource="{Binding RunHistory}"
+                        SelectionMode="None">
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Frame Margin="8" Padding="16"
+                           CornerRadius="10"
+                           BorderColor="#e0e0e0"
+                           HasShadow="True">
+                        <Grid ColumnDefinitions="*,Auto">
+
+                            <StackLayout Grid.Column="0" Spacing="8">
+
+                                <!-- Date -->
+                                <Label Text="{Binding StartTime, StringFormat='{0:MMM dd, yyyy - HH:mm}'}"
+                                       FontSize="14" FontAttributes="Bold" TextColor="#333"/>
+
+                                <!-- Stats -->
+                                <HorizontalStackLayout Spacing="16">
+
+                                    <VerticalStackLayout>
+                                        <Label Text="Distance" FontSize="12" TextColor="#666"/>
+                                        <Label Text="{Binding DistanceFormatted}" FontAttributes="Bold"/>
+                                    </VerticalStackLayout>
+
+                                    <VerticalStackLayout>
+                                        <Label Text="Duration" FontSize="12" TextColor="#666"/>
+                                        <Label Text="{Binding DurationFormatted}" FontAttributes="Bold"/>
+                                    </VerticalStackLayout>
+
+                                    <VerticalStackLayout>
+                                        <Label Text="Avg Pace" FontSize="12" TextColor="#666"/>
+                                        <Label Text="{Binding AveragePaceFormatted}" FontAttributes="Bold"/>
+                                    </VerticalStackLayout>
+
+                                </HorizontalStackLayout>
+                            </StackLayout>
+
+                            <!-- Action buttons -->
+                            <VerticalStackLayout Grid.Column="1" Spacing="8" HorizontalOptions="End">
+                                <Button Text="View"
+                                        FontSize="12"
+                                        WidthRequest="56"
+                                        HeightRequest="36"
+                                        BackgroundColor="Blue"
+                                        TextColor="White"
+                                        Clicked="OnViewClicked"
+                                        CommandParameter="{Binding .}" />
+                                <Button Text="Edit"
+                                        FontSize="12"
+                                        WidthRequest="56"
+                                        HeightRequest="36"
+                                        Clicked="OnEditClicked"
+                                        CommandParameter="{Binding .}" />
+                                <Button Text="Delete"
+                                        FontSize="10"
+                                        WidthRequest="56"
+                                        HeightRequest="36"
+                                        Padding="0"
+                                        BackgroundColor="Red"
+                                        TextColor="White"
+                                        Command="{Binding Source={x:Reference ThisPage}, Path=BindingContext.DeleteRunCommand}"
+                                        CommandParameter="{Binding .}" />
+                            </VerticalStackLayout>
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+
+            <CollectionView.EmptyView>
+                <StackLayout Padding="20" VerticalOptions="Center" HorizontalOptions="Center">
+                    <Label Text="No runs yet!"
+                           FontSize="18" FontAttributes="Bold"
+                           HorizontalTextAlignment="Center"/>
+                    <Label Text="Start tracking your first run to see it here"
+                           FontSize="14" TextColor="#666"
+                           HorizontalTextAlignment="Center"/>
+                </StackLayout>
+            </CollectionView.EmptyView>
+
+        </CollectionView>
+    </Grid>
+</ContentPage>

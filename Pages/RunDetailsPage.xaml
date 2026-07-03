@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="RunWise.Pages.RunDetailsPage"
+             Title="Run Details">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="12">
+            <Label Text="Run Details" FontAttributes="Bold" FontSize="18" HorizontalOptions="Center" />
+
+            <Label Text="Date and Time" FontAttributes="Bold" />
+            <Label Text="{Binding StartTime, StringFormat='{0:MMM dd, yyyy - HH:mm}'}" />
+
+            <Label Text="Distance" FontAttributes="Bold" />
+            <Label Text="{Binding DistanceFormatted}" />
+
+            <Label Text="Duration" FontAttributes="Bold" />
+            <Label Text="{Binding DurationFormatted}" />
+
+            <Label Text="Average Pace" FontAttributes="Bold" />
+            <Label Text="{Binding AveragePaceFormatted}" />
+
+            <HorizontalStackLayout Spacing="12">
+                <Button Text="Export PDF" Clicked="OnExportPdfClicked" />
+                <Button Text="Close" Clicked="OnCloseClicked" />
+            </HorizontalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

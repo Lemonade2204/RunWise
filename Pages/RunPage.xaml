@@ -2,25 +2,50 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RunWise.Pages.RunPage"
-             Title="Run">
+             Title="Run Tracker">
     <Grid RowDefinitions="*, Auto">
         <WebView x:Name="MapWebView" Grid.Row="0" />
 
-        <StackLayout Grid.Row="1" Orientation="Horizontal"
+        <StackLayout Grid.Row="1" Orientation="Vertical"
                      BackgroundColor="#1e1e1e"
                      Padding="12"
-                     Spacing="12"
-                     HorizontalOptions="Fill">
-            <VerticalStackLayout HorizontalOptions="StartAndExpand">
-                <Label x:Name="TimeLabel" Text="00:00:00" TextColor="White" FontSize="20" />
-                <Label x:Name="DistanceLabel" Text="Distance: 0.00 km" TextColor="White" FontSize="14" />
-            </VerticalStackLayout>
+                     Spacing="12">
+            
+            <!-- Stats | Duration    Distance     Pace   -->
+            <HorizontalStackLayout HorizontalOptions="FillAndExpand" Spacing="16">
+                <VerticalStackLayout HorizontalOptions="FillAndExpand">
+                    <Label Text="Duration" FontSize="12" TextColor="#aaa"/>
+                    <Label Text="{Binding ElapsedTime, StringFormat='{0:hh\\:mm\\:ss}'}" 
+                           FontSize="24" FontAttributes="Bold" TextColor="White"/>
+                </VerticalStackLayout>
 
-            <HorizontalStackLayout HorizontalOptions="End" Spacing="8">
-                <Button x:Name="StartButton" Text="Start" Clicked="StartButton_Clicked" />
-                <Button x:Name="PauseButton" Text="Pause" Clicked="PauseButton_Clicked" IsEnabled="False" />
-                <Button x:Name="StopButton" Text="Stop" Clicked="StopButton_Clicked" IsEnabled="False" />
+                <VerticalStackLayout HorizontalOptions="FillAndExpand">
+                    <Label Text="Distance" FontSize="12" TextColor="#aaa"/>
+                    <Label Text="{Binding DistanceKm, StringFormat='{0:F2} km'}" 
+                           FontSize="24" FontAttributes="Bold" TextColor="White"/>
+                </VerticalStackLayout>
+                <VerticalStackLayout HorizontalOptions="FillAndExpand">
+                    <Label Text="Pace" FontSize="12" TextColor="#aaa"/>
+                    <Label Text="{Binding CurrentPaceKmh}" FontSize="16" FontAttributes="Bold" TextColor="White"/>
+                </VerticalStackLayout>
             </HorizontalStackLayout>
+
+            <!-- Start Pause Stop  -->
+            <HorizontalStackLayout HorizontalOptions="FillAndExpand" Spacing="8">
+                <Button Text="Start"
+                        Command="{Binding StartTrackingCommand}"
+                        HorizontalOptions="FillAndExpand"/>
+
+                <Button Text="Pause"
+                        Command="{Binding PauseTrackingCommand}"
+                        HorizontalOptions="FillAndExpand"/>
+                <Button Text="Stop"
+                        Command="{Binding StopTrackingCommand}"
+                        BackgroundColor="#cc3333"
+                        HorizontalOptions="FillAndExpand"/>
+
+            </HorizontalStackLayout>
+
         </StackLayout>
     </Grid>
 </ContentPage>

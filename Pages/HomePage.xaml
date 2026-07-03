@@ -3,6 +3,39 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RunWise.Pages.HomePage"
              Title="Home">
-    
-    
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="16">
+
+            <Label Text="Recent Run" FontSize="24" FontAttributes="Bold" TextColor="#333"/>
+
+            <!-- No runs state -->
+            <Frame Padding="16" CornerRadius="10" BorderColor="#e0e0e0" HasShadow="True"
+                   IsVisible="{Binding NoRuns}">
+                <Label Text="No runs yet. Start tracking your first run!" FontSize="16" TextColor="#666" HorizontalTextAlignment="Center"/>
+            </Frame>
+
+            <!-- Recent run state -->
+            <Frame Padding="16" CornerRadius="10" BorderColor="#e0e0e0" HasShadow="True"
+                   IsVisible="{Binding HasRecentRun}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="{Binding RecentRunDate}" FontSize="16" FontAttributes="Bold" TextColor="#333"/>
+                    <HorizontalStackLayout Spacing="16">
+                        <VerticalStackLayout>
+                            <Label Text="Distance" FontSize="12" TextColor="#666"/>
+                            <Label Text="{Binding RecentDistance}" FontSize="16" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout>
+                            <Label Text="Duration" FontSize="12" TextColor="#666"/>
+                            <Label Text="{Binding RecentDuration}" FontSize="16" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout>
+                            <Label Text="Avg Pace" FontSize="12" TextColor="#666"/>
+                            <Label Text="{Binding RecentAvgPace}" FontSize="16" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

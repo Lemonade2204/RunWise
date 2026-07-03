@@ -42,7 +42,10 @@ public partial class MapPage : ContentPage
         var latStr = lat.ToString(CultureInfo.InvariantCulture);
         var lonStr = lon.ToString(CultureInfo.InvariantCulture);
 
-        var html = $@"<!DOCTYPE html>
+
+        //Map leaflet html used webview
+        var html = $@"
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset='utf-8'/>
