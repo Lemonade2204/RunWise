@@ -17,7 +17,12 @@ public partial class RunViewModel : ObservableObject
 	private Location? _lastLocation;
 	private bool _isListening = false;
 
-	[ObservableProperty]
+	// next kilometer milestone to announce (1km, 2km, ...)
+	private double _nextMilestoneKm = 1.0;
+	private readonly OpenRouterService _openRouterService;
+    private bool _overexertionAlerted;
+
+    [ObservableProperty]
 	private TimeSpan elapsedTime = TimeSpan.Zero;
 
 	[ObservableProperty]
@@ -44,6 +49,7 @@ public partial class RunViewModel : ObservableObject
 	public RunViewModel()
 	{
 		_trackerService = new RunTrackerService();
+		_openRouterService = new OpenRouterService();
 		_uiTimer = new System.Timers.Timer(1000);
 		_uiTimer.Elapsed += (s, e) =>
 		{
@@ -55,12 +61,15 @@ public partial class RunViewModel : ObservableObject
 					_currentRun.Duration = _stopwatch.Elapsed;
 					UpdatePace();
 				}
+
+
+
 			});
 		};
 		LoadHistory();
 	}
 
-	private async void LoadHistory()
+    private async void LoadHistory()
 	{
 		var runs = await _trackerService.GetAllRunsAsync();
 		RunHistory.Clear();
@@ -76,6 +85,18 @@ public partial class RunViewModel : ObservableObject
 		{
 			var pace = _currentRun.DistanceKm / _stopwatch.Elapsed.TotalHours;
 			CurrentPaceKmh = $"{Math.Round(pace, 2):F2} km/h";
+
+			// Check for overexertion (threshold: 15 km/h)
+			if (pace > 15.0 && !_overexertionAlerted)
+			{
+				_overexertionAlerted = true;
+				_ = TriggerOverexertionAlertAsync(pace);
+			}
+			else if (pace <= 15.0 && _overexertionAlerted)
+			{
+				// reset alert when pace drops back below threshold
+				_overexertionAlerted = false;
+			}
 		}
 	}
 
@@ -163,8 +184,8 @@ public partial class RunViewModel : ObservableObject
 				if (_currentRun != null)
 				{
 					//_currentRun.RoutePoints.Add((last.Latitude, last.Longitude));
-                    _currentRun.RoutePoints.Add(new RoutePoint { Latitude = last.Latitude, Longitude = last.Longitude });
-                }
+					_currentRun.RoutePoints.Add(new RoutePoint { Latitude = last.Latitude, Longitude = last.Longitude });
+				}
 			}
 
 			var listenRequest = new GeolocationListeningRequest(GeolocationAccuracy.Best);
@@ -196,9 +217,9 @@ public partial class RunViewModel : ObservableObject
 			var lon = e.Location.Longitude;
 
 			//_currentRun.RoutePoints.Add((lat, lon));
-            _currentRun.RoutePoints.Add(new RoutePoint { Latitude = lat, Longitude = lon });
+			_currentRun.RoutePoints.Add(new RoutePoint { Latitude = lat, Longitude = lon });
 
-            if (_lastLocation != null)
+			if (_lastLocation != null)
 			{
 				double distance = DistanceBetween(
 					_lastLocation.Latitude, _lastLocation.Longitude,
@@ -207,7 +228,18 @@ public partial class RunViewModel : ObservableObject
 				DistanceKm += distance / 1000.0;
 				_currentRun.DistanceMeters += distance;
 				UpdatePace();
+
+				// Check for kilometer milestones (1km, 2km, ...)
+				if (DistanceKm >= _nextMilestoneKm - 0.0001)
+				{
+					// capture milestone value
+					var milestone = _nextMilestoneKm;
+					// schedule async coaching without blocking location handler
+					_ = TriggerCoachingAsync(milestone);
+					_nextMilestoneKm += 1.0;
+				}
 			}
+
 
 			_lastLocation = new Location(lat, lon);
 
@@ -228,6 +260,52 @@ public partial class RunViewModel : ObservableObject
 		return R * c;
 	}
 
+	private async Task TriggerCoachingAsync(double milestoneKm)
+	{
+		try
+		{
+			// Build a concise prompt for the AI
+			var prompt = $"You are a friendly running coach. The runner has just reached {milestoneKm:F0} km. Give a short (1-2 sentence) motivational cue and one quick tip to maintain pace or form. Keep it upbeat and concise. make it short, Also tell him that he has reached the milestone";
 
+			var cue = await _openRouterService.GetCoachingCueAsync(prompt);
+			if (!string.IsNullOrWhiteSpace(cue))
+			{
+				await TextToSpeech.Default.SpeakAsync(cue);
+			}
+			else
+			{
+				await TextToSpeech.Default.SpeakAsync($"Great job — you've reached {milestoneKm:F0} kilometers. Keep it up!");
+			}
+		}
+		catch (Exception ex)
+		{
+			System.Diagnostics.Debug.WriteLine($"Coaching error: {ex}");
+			await TextToSpeech.Default.SpeakAsync($"Great job — you've reached {milestoneKm:F0} kilometers. Keep going!");
+		}
+	}
+
+    private async Task TriggerOverexertionAlertAsync(double paceKmh)
+    {
+        try
+        {
+            // Try to get a short warning from the AI first
+            var prompt = $"You are a concise safety coach. The runner is currently running at {paceKmh:F1} km/h, which is very fast. Give a short (1-2 sentence) warning to slow down slightly to avoid overexertion and also give him a quick tip to maintain pace or form.";
+
+            var cue = await _openRouterService.GetCoachingCueAsync(prompt);
+            if (!string.IsNullOrWhiteSpace(cue))
+            {
+                await TextToSpeech.Default.SpeakAsync(cue);
+            }
+            else
+            {
+                await TextToSpeech.Default.SpeakAsync($"Warning: your speed is {paceKmh:F1} kilometers per hour. Please slow down to avoid overexertion.");
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Overexertion alert error: {ex}");
+            await TextToSpeech.Default.SpeakAsync($"Warning: your speed is {paceKmh:F1} kilometers per hour. Please slow down to avoid overexertion.");
+        }
+    }
 
 }

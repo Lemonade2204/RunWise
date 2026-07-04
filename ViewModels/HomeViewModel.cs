@@ -1,41 +1,47 @@
+
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using RunWise;
 using RunWise.Models;
 using System.Text.Json;
 
 public partial class HomeViewModel : ObservableObject
 {
-    [ObservableProperty] 
+    [ObservableProperty]
     private string recentRunDate = "";
-    [ObservableProperty] 
+    [ObservableProperty]
     private string recentDistance = "";
     [ObservableProperty]
     private string recentDuration = "";
-    [ObservableProperty] 
+    [ObservableProperty]
     private string recentAvgPace = "";
-    [ObservableProperty] 
+    [ObservableProperty]
     private bool hasRecentRun = false;
-    [ObservableProperty] 
+    [ObservableProperty]
     private bool noRuns = true;
 
     public async Task LoadDashboard()
     {
         try
         {
-            var dataPath = Path.Combine(FileSystem.AppDataDirectory, "run_history.json");
+            // Use RunTrackerService to load runs (will prefer remote when signed in)
+            var tracker = MauiProgram.Services.GetService(typeof(RunWise.Services.RunTrackerService)) as RunWise.Services.RunTrackerService
+                ?? new RunWise.Services.RunTrackerService();
 
-            if (!File.Exists(dataPath)) { NoRuns = true; HasRecentRun = false; return; }
+            var runs = await tracker.GetAllRunsAsync();
 
-            var json = await File.ReadAllTextAsync(dataPath);
-            var runs = JsonSerializer.Deserialize<List<RunSession>>(json) ?? new();
-
-            //check if the data has runs
-            if (runs.Count == 0) 
-            { 
-                NoRuns = true; 
-                HasRecentRun = false; return; 
+            // check if the data has runs
+            if (runs == null || runs.Count == 0)
+            {
+                NoRuns = true;
+                HasRecentRun = false; return;
             }
 
-            var recentRun = runs.OrderByDescending(r => r.StartTime).First();
+            var recentRun = runs.OrderByDescending(r => r.StartTime).FirstOrDefault();
+            if (recentRun == null)
+            {
+                NoRuns = true; HasRecentRun = false; return;
+            }
             RecentRunDate = recentRun.StartTime.ToString("MMM dd, yyyy - HH:mm");
             RecentDistance = $"{recentRun.DistanceFormatted} km";
             RecentDuration = recentRun.DurationFormatted;
@@ -46,7 +52,22 @@ public partial class HomeViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Dashboard load error: {ex.Message}");
+            var openRouter = new OpenRouterService();
+            var cue = await openRouter.GetCoachingCueAsync("Runner increased speed 15% during their run, give encouragement. or call him a good boy or something");
+
+            if (cue != null)
+            {
+                await TextToSpeech.Default.SpeakAsync(cue);
+            }
+            else
+            {
+                // fallback canned phrase
+                await TextToSpeech.Default.SpeakAsync("Keep going, you've got this!");
+            }
         }
+
+
+
+
     }
 }

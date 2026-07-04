@@ -18,6 +18,8 @@ public class RunSession
 
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public DateTime StartTime { get; set; } = DateTime.UtcNow;
+    // optional owner id (supabase user id) - helps filter local runs per user
+    public string? UserId { get; set; }
     public DateTime? EndTime { get; set; }
     public TimeSpan Duration { get; set; }
     public double DistanceMeters { get; set; }

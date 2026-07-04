@@ -10,6 +10,8 @@ namespace RunWise
             InitializeComponent();
             Routing.RegisterRoute("editrun", typeof(EditRunPage));
             Routing.RegisterRoute("rundetails", typeof(Pages.RunDetailsPage));
+            Routing.RegisterRoute("login", typeof(Pages.LoginPage));
+            Routing.RegisterRoute("register", typeof(Pages.RegisterPage));
         }
     }
 }

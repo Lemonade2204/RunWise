@@ -11,7 +11,8 @@ namespace RunWise
 
         protected override Window CreateWindow(IActivationState? activationState)
         {
-            return new Window(new AppShell());
+            // Show the LoginPage when the app starts. Wrap in a NavigationPage so we can push the RegisterPage.
+            return new Window(new NavigationPage(new Pages.LoginPage()));
         }
     }
 }

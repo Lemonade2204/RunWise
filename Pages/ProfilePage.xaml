@@ -4,9 +4,6 @@
              x:Class="RunWise.Pages.ProfilePage"
              Title="ProfilePage">
     <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
+        <Button x:Name="LogoutButton" Text="Log Out" Clicked="OnLogoutClicked" HorizontalOptions="Center" Margin="0,20,0,0" />
     </VerticalStackLayout>
 </ContentPage>

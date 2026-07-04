@@ -5,7 +5,7 @@
              Title="Home">
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="16">
-
+           
             <Label Text="Recent Run" FontSize="24" FontAttributes="Bold" TextColor="#333"/>
 
             <!-- No runs state -->
@@ -35,7 +35,8 @@
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
             </Frame>
-
+            
+            
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

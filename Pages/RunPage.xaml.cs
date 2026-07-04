@@ -27,6 +27,20 @@ public partial class RunPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+        // Show the map centered on last known location, but do NOT start tracking/listening yet.
+        try
+        {
+            var last = await Geolocation.Default.GetLastKnownLocationAsync();
+            if (last != null && !_mapLoaded)
+            {
+                LoadMap(last.Latitude, last.Longitude);
+                _mapLoaded = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error getting last known location: {ex.Message}");
+        }
     }
 
     protected override async void OnDisappearing()

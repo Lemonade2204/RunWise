@@ -4,6 +4,12 @@
         <name>RunWise</name>
     </assembly>
     <members>
+        <member name="M:RunWise.Services.RunTrackerService.RemoveLocalRunsNotOwnedAsync(System.String)">
+            <summary>
+            Remove local runs that are owned by a different user than the supplied userId.
+            Keeps runs that have null/empty UserId (unsynced local runs).
+            </summary>
+        </member>
         <member name="T:RunWise.ViewModels.HistoryViewModel">
             <inheritdoc/>
             <inheritdoc/>
