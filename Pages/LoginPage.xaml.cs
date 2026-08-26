@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.ApplicationModel;
 using RunWise.Services;
 
 namespace RunWise.Pages;
@@ -43,7 +44,8 @@ public partial class LoginPage : ContentPage
 			catch { }
 
 			// Replace the app's MainPage with the AppShell to show the main app UI
-			Application.Current.MainPage = new AppShell();
+			// Ensure this runs on the UI thread to avoid fragment/view attach timing issues on Android
+			MainThread.BeginInvokeOnMainThread(() => Application.Current.MainPage = new AppShell());
 		}
 		else
 		{

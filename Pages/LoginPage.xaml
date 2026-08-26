@@ -8,6 +8,7 @@
     <ScrollView>
         <VerticalStackLayout Padding="30" Spacing="16" VerticalOptions="Center">
 
+       
             <Label Text="RunWise"
                    FontSize="28"
                    FontAttributes="Bold"

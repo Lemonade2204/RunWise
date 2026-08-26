@@ -1,4 +1,4 @@
-<api type="debug" assembly-name="RunWise" mvid="1aa9a95faa66463fb8e06effb288efd5">
+<api type="debug" assembly-name="RunWise" mvid="3751f1f1d485460eae6a63dcdbbd5204">
   <java-to-managed>
     <entry java-name="crc64040fd1429a0a3407/MainActivity" managed-name="RunWise.MainActivity, RunWise" managed-type-token-id="33554465" />
     <entry java-name="crc64040fd1429a0a3407/MainApplication" managed-name="RunWise.MainApplication, RunWise" managed-type-token-id="33554466" />

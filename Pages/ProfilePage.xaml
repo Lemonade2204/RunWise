@@ -3,7 +3,45 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RunWise.Pages.ProfilePage"
              Title="ProfilePage">
-    <VerticalStackLayout>
-        <Button x:Name="LogoutButton" Text="Log Out" Clicked="OnLogoutClicked" HorizontalOptions="Center" Margin="0,20,0,0" />
-    </VerticalStackLayout>
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="12">
+            <Label Text="Profile" FontSize="24" HorizontalOptions="Center" />
+
+            <Label Text="Email (Gmail)" />
+            <Label x:Name="EmailLabel" />
+
+            <Label Text="Name" />
+            <Entry x:Name="NameEntry" Placeholder="Your name" IsEnabled="False" />
+
+            <Label Text="Weight (kg)" />
+            <Entry x:Name="WeightEntry" Keyboard="Numeric" Placeholder="e.g. 70" IsEnabled="False" />
+
+            <Label Text="Height (cm)" />
+            <Entry x:Name="HeightEntry" Keyboard="Numeric" Placeholder="e.g. 175" IsEnabled="False" />
+
+            <HorizontalStackLayout Spacing="12" HorizontalOptions="Center">
+                <Button x:Name="EditButton" Text="Edit" Clicked="OnEditClicked" />
+                <Button x:Name="SaveButton" Text="Save" Clicked="OnSaveClicked" IsVisible="False" />
+                <Button x:Name="CancelButton" Text="Cancel" Clicked="OnCancelClicked" IsVisible="False" />
+            </HorizontalStackLayout>
+
+            <Frame Padding="10" CornerRadius="6" BorderColor="#DDD">
+                <VerticalStackLayout>
+                    <Label Text="This Week (avg)" FontAttributes="Bold" />
+                    <Label x:Name="WeeklyDistanceLabel" Text="Distance: -" />
+                    <Label x:Name="WeeklyTimeLabel" Text="Time: -" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Frame Padding="10" CornerRadius="6" BorderColor="#DDD">
+                <VerticalStackLayout>
+                    <Label Text="All Time" FontAttributes="Bold" />
+                    <Label x:Name="AllTimeDistanceLabel" Text="Distance: -" />
+                    <Label x:Name="AllTimeTimeLabel" Text="Time: -" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <Button x:Name="LogoutButton" Text="Log Out" Clicked="OnLogoutClicked" HorizontalOptions="Center" Margin="0,20,0,0" />
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

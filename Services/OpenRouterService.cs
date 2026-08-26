@@ -5,7 +5,7 @@ using System.Text.Json;
 public class OpenRouterService
 {
     private readonly HttpClient _client;
-    private const string ApiKey = "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";
+    private const string ApiKey = "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";
     public OpenRouterService()
     {
         _client = new HttpClient

@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
+using RunWise.Models;
 
 namespace RunWise.Services;
 
@@ -155,6 +156,129 @@ public class SupabaseAuthService
             var content = await resp.Content.ReadAsStringAsync();
             return (false, $"Create profile failed: {resp.StatusCode}: {content}");
         }
+
+        return (true, null);
+    }
+
+    public async Task<(bool Success, string? Error, Profile? Profile)> GetProfileAsync()
+    {
+        if (string.IsNullOrEmpty(UserId))
+            return (false, "UserId is not available", null);
+
+        var url = $"/rest/v1/profiles?select=*&id=eq.{UserId}";
+        var req = new HttpRequestMessage(HttpMethod.Get, url);
+
+        // Use the user's access token for auth if available
+        if (!string.IsNullOrEmpty(AccessToken))
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
+        else
+            req.Headers.Add("apikey", _apiKey);
+
+        req.Headers.Add("Accept", "application/json");
+
+        var resp = await _http.SendAsync(req);
+        var content = await resp.Content.ReadAsStringAsync();
+
+        if (!resp.IsSuccessStatusCode)
+            return (false, $"Get profile failed: {resp.StatusCode}: {content}", null);
+
+        try
+        {
+            using var doc = JsonDocument.Parse(content);
+            if (doc.RootElement.ValueKind != JsonValueKind.Array || doc.RootElement.GetArrayLength() == 0)
+                return (false, "Profile not found", null);
+
+            var el = doc.RootElement[0];
+            var profile = new Profile();
+            if (el.TryGetProperty("id", out var idEl))
+                profile.Id = idEl.GetString();
+            if (el.TryGetProperty("email", out var emailEl))
+                profile.Email = emailEl.GetString();
+            if (el.TryGetProperty("username", out var userEl))
+                profile.Username = userEl.GetString();
+            if (el.TryGetProperty("weight_kg", out var wEl))
+            {
+                if (wEl.ValueKind == JsonValueKind.Number && wEl.TryGetDouble(out var dv))
+                    profile.WeightKg = dv;
+                else if (wEl.ValueKind == JsonValueKind.String && double.TryParse(wEl.GetString(), out var dv2))
+                    profile.WeightKg = dv2;
+            }
+            if (el.TryGetProperty("height_cm", out var hEl))
+            {
+                if (hEl.ValueKind == JsonValueKind.Number && hEl.TryGetDouble(out var dv))
+                    profile.HeightCm = dv;
+                else if (hEl.ValueKind == JsonValueKind.String && double.TryParse(hEl.GetString(), out var dv2))
+                    profile.HeightCm = dv2;
+            }
+            if (el.TryGetProperty("weekly_avg_distance_km", out var wadEl))
+            {
+                if (wadEl.ValueKind == JsonValueKind.Number && wadEl.TryGetDouble(out var dv))
+                    profile.WeeklyAverageDistanceKm = dv;
+                else if (wadEl.ValueKind == JsonValueKind.String && double.TryParse(wadEl.GetString(), out var dv2))
+                    profile.WeeklyAverageDistanceKm = dv2;
+            }
+            if (el.TryGetProperty("weekly_avg_time_seconds", out var watsEl))
+            {
+                if (watsEl.ValueKind == JsonValueKind.Number && watsEl.TryGetInt32(out var ival))
+                    profile.WeeklyAverageTimeSeconds = ival;
+                else if (watsEl.ValueKind == JsonValueKind.String && int.TryParse(watsEl.GetString(), out var ival2))
+                    profile.WeeklyAverageTimeSeconds = ival2;
+            }
+            if (el.TryGetProperty("all_time_distance_km", out var atdEl))
+            {
+                if (atdEl.ValueKind == JsonValueKind.Number && atdEl.TryGetDouble(out var dv))
+                    profile.AllTimeDistanceKm = dv;
+                else if (atdEl.ValueKind == JsonValueKind.String && double.TryParse(atdEl.GetString(), out var dv2))
+                    profile.AllTimeDistanceKm = dv2;
+            }
+            if (el.TryGetProperty("all_time_time_seconds", out var attsEl))
+            {
+                if (attsEl.ValueKind == JsonValueKind.Number && attsEl.TryGetInt32(out var ival))
+                    profile.AllTimeTimeSeconds = ival;
+                else if (attsEl.ValueKind == JsonValueKind.String && int.TryParse(attsEl.GetString(), out var ival2))
+                    profile.AllTimeTimeSeconds = ival2;
+            }
+
+            return (true, null, profile);
+        }
+        catch (Exception ex)
+        {
+            return (false, $"Failed to parse profile: {ex.Message}", null);
+        }
+    }
+
+    public async Task<(bool Success, string? Error)> UpdateProfileAsync(Profile profile)
+    {
+        if (string.IsNullOrEmpty(UserId))
+            return (false, "UserId is not available");
+
+        var payload = new Dictionary<string, object?>()
+        {
+            ["username"] = profile.Username,
+            ["weight_kg"] = profile.WeightKg,
+            ["height_cm"] = profile.HeightCm,
+            ["weekly_avg_distance_km"] = profile.WeeklyAverageDistanceKm,
+            ["weekly_avg_time_seconds"] = profile.WeeklyAverageTimeSeconds,
+            ["all_time_distance_km"] = profile.AllTimeDistanceKm,
+            ["all_time_time_seconds"] = profile.AllTimeTimeSeconds
+        };
+
+        var req = new HttpRequestMessage(HttpMethod.Patch, $"/rest/v1/profiles?id=eq.{UserId}")
+        {
+            Content = JsonContent.Create(payload)
+        };
+
+        if (!string.IsNullOrEmpty(AccessToken))
+            req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", AccessToken);
+        else
+            req.Headers.Add("apikey", _apiKey);
+
+        req.Headers.Add("Accept", "application/json");
+
+        var resp = await _http.SendAsync(req);
+        var content = await resp.Content.ReadAsStringAsync();
+        if (!resp.IsSuccessStatusCode)
+            return (false, $"Update profile failed: {resp.StatusCode}: {content}");
 
         return (true, null);
     }

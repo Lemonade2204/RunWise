@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("RunWise")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+b55b7432f3ab7636b845aec6ced295f59cea0c19")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0+9f7ecba4f9df18c7fe36cf49007c385aa0a0c4df")]
 [assembly: System.Reflection.AssemblyProductAttribute("RunWise")]
 [assembly: System.Reflection.AssemblyTitleAttribute("RunWise")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

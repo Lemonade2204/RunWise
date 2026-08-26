@@ -12,17 +12,17 @@
         <ShellContent
         Title="Home"
         ContentTemplate="{DataTemplate local:Pages.HomePage}"
-        Route="MainPage" />
+        Route="home" />
 
         <ShellContent
         Title="Maps"
         ContentTemplate="{DataTemplate local:Pages.MapPage}"
-        Route="MainPage" />
+        Route="maps" />
 
         <ShellContent
         Title="Run"
         ContentTemplate="{DataTemplate local:Pages.RunPage}"
-        Route="MainPage" />
+        Route="run" />
 
         <ShellContent
         Title="History"
@@ -32,7 +32,7 @@
         <ShellContent
         Title="Profile"
         ContentTemplate="{DataTemplate local:Pages.ProfilePage}"
-        Route="MainPage" />
+        Route="profile" />
     </FlyoutItem>
 
     
