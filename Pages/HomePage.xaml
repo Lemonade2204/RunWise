@@ -5,8 +5,10 @@
              Title="Home">
     <ScrollView>
         <VerticalStackLayout Padding="16" Spacing="16">
-           
+
             <Label Text="Recent Run" FontSize="24" FontAttributes="Bold" TextColor="#333"/>
+
+
 
             <!-- No runs state -->
             <Frame Padding="16" CornerRadius="10" BorderColor="#e0e0e0" HasShadow="True"

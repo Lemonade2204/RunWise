@@ -1,5 +1,6 @@
 using CommunityToolkit.Maui;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
 using PdfSharpCore.Fonts;
 using RunWise.Services;
 
@@ -35,6 +36,13 @@ namespace RunWise
 
             // Register Supabase database service and pass the auth instance so it can use the user's token
             builder.Services.AddSingleton(new SupabaseDatabaseService(supabaseUrl, supabaseAnonKey, supabaseAuth));
+
+            // Register simple food recommendation service
+            builder.Services.AddSingleton<FoodRecommendationService>();
+            // Register Food API client
+            builder.Services.AddHttpClient<FoodApiService>();
+
+
 
             var app = builder.Build();
             Services = app.Services;

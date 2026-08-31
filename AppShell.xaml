@@ -33,6 +33,13 @@
         Title="Profile"
         ContentTemplate="{DataTemplate local:Pages.ProfilePage}"
         Route="profile" />
+
+        <ShellContent
+        Title="Food"
+        ContentTemplate="{DataTemplate local:Pages.FoodRecommendationPage}"
+        Route="food" />
+
+
     </FlyoutItem>
 
     
