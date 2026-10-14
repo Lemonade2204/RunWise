@@ -1,131 +1,241 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Maui.Controls;
 using RunWise.Services;
-using System.Text.Json;
 using RunWise.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace RunWise.Pages
 {
+    [QueryProperty(nameof(CaloriesQuery), "calories")]
+    [QueryProperty(nameof(InitialSearch), "search")]
+    [QueryProperty(nameof(MealTarget), "meal")]
+    [QueryProperty(nameof(MealDate), "date")]
     public partial class FoodRecommendationPage : ContentPage
     {
-        private readonly FoodApiService _api;
-        private readonly FoodRecommendationService _recommender;
-        private readonly GeminiService _gemini;
+        private readonly CalorieApiService _api;
+        private RunWise.Models.MealType? _targetMealType;
+        private readonly Services.MealStore _mealStore;
+       
 
         public FoodRecommendationPage()
         {
             InitializeComponent();
 
-            _api = MauiProgram.Services.GetService(typeof(FoodApiService)) as FoodApiService ?? throw new InvalidOperationException("FoodApiService not registered");
-            _recommender = MauiProgram.Services.GetService(typeof(FoodRecommendationService)) as FoodRecommendationService ?? throw new InvalidOperationException("FoodRecommendationService not registered");
-            _gemini = new GeminiService();
+            _api = MauiProgram.Services.GetService(typeof(CalorieApiService)) as CalorieApiService ?? throw new InvalidOperationException("CalorieApiService not registered");
+            _mealStore = MauiProgram.Services.GetService(typeof(Services.MealStore)) as Services.MealStore ?? new Services.MealStore();
+
+            // refresh total calories on open
+            _ = UpdateTotalCaloriesAsync();
+
+        }
+
+        private string mealDate = string.Empty;
+        public string MealDate
+        {
+            get => mealDate;
+            set
+            {
+                mealDate = value ?? string.Empty;
+                if (DateTime.TryParse(mealDate, out var dt))
+                {
+                    // ensure future Add uses this date
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        try
+                        {
+                            var dp = this.FindByName<DatePicker>("DatePicker");
+                            if (dp != null) dp.Date = dt.Date;
+                        }
+                        catch { }
+                    });
+                }
+            }
+        }
+
+        // Initial search term supplied via Shell navigation
+        private string initialSearch = string.Empty;
+        public string InitialSearch
+        {
+            get => initialSearch;
+            set
+            {
+                initialSearch = value ?? string.Empty;
+                if (!string.IsNullOrWhiteSpace(initialSearch))
+                {
+                    Device.BeginInvokeOnMainThread(async () =>
+                    {
+                        CaloriesEntry.Text = initialSearch;
+                        await RecommendForQuery(initialSearch);
+                    });
+                }
+            }
+        }
+
+        private string mealTarget = string.Empty;
+        public string MealTarget
+        {
+            get => mealTarget;
+            set
+            {
+                mealTarget = value ?? string.Empty;
+                if (Enum.TryParse<RunWise.Models.MealType>(mealTarget, out var mt))
+                {
+                    _targetMealType = mt;
+                    // update UI indicator and picker selection
+                    Device.BeginInvokeOnMainThread(() =>
+                    {
+                        TargetMealLabel.Text = $"Add to: {mt}";
+                        try { MealTypePicker.SelectedItem = mt.ToString(); } catch { }
+                    });
+                }
+                else
+                {
+                    _targetMealType = null;
+                    Device.BeginInvokeOnMainThread(() => TargetMealLabel.Text = "Food");
+                }
+            }
+        }
+
+        // Populate picker after InitializeComponent
+        protected override void OnAppearing()
+        {
+            base.OnAppearing();
+            try
+            {
+                MealTypePicker.Items.Clear();
+                MealTypePicker.Items.Add("Breakfast");
+                MealTypePicker.Items.Add("Lunch");
+                MealTypePicker.Items.Add("Dinner");
+                MealTypePicker.Items.Add("Snack");
+                MealTypePicker.SelectedIndexChanged += MealTypePicker_SelectedIndexChanged;
+            }
+            catch { }
+        }
+
+        private void MealTypePicker_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                var p = sender as Picker;
+                var sel = p?.SelectedItem?.ToString() ?? string.Empty;
+                if (Enum.TryParse<RunWise.Models.MealType>(sel, out var mt))
+                {
+                    _targetMealType = mt;
+                    TargetMealLabel.Text = $"Add to: {mt}";
+                }
+            }
+            catch { }
         }
 
         private async void OnGetRecommendationClicked(object sender, EventArgs e)
         {
-            if (!int.TryParse(CaloriesEntry.Text, out var remaining))
+            var button = sender as Button;
+            try
             {
-                await DisplayAlert("Invalid", "Please enter a valid number for remaining calories.", "OK");
-                return;
-            }
+                if (button != null)
+                    button.IsEnabled = false;
 
+                var query = (CaloriesEntry.Text ?? string.Empty).Trim();
+                if (string.IsNullOrEmpty(query))
+                {
+                    await DisplayAlert("Invalid", "Please enter a food name to search for.", "OK");
+                    return;
+                }
+
+                // If the user entered an integer, treat it as remaining calories; otherwise treat as a search term.
+                if (int.TryParse(query, out var cal))
+                {
+                    await RecommendForCalories(cal);
+                }
+                else
+                {
+                    await RecommendForQuery(query);
+                }
+            }
+            finally
+            {
+                if (button != null)
+                    button.IsEnabled = true;
+            }
+        }
+
+        // Allow receiving initial calories via Shell query parameter 'calories'
+        string caloriesQuery;
+        public string CaloriesQuery
+        {
+            set
+            {
+                caloriesQuery = Uri.UnescapeDataString(value ?? string.Empty);
+                if (int.TryParse(caloriesQuery, out var cal))
+                {
+                    // update UI and trigger recommendation
+                    Device.BeginInvokeOnMainThread(async () =>
+                    {
+                        CaloriesEntry.Text = cal.ToString();
+                        await RecommendForCalories(cal);
+                    });
+                }
+            }
+        }
+
+        private async System.Threading.Tasks.Task RecommendForCalories(int remaining)
+        {
             PickLabel.Text = "Loading...";
             CandidatesList.ItemsSource = null;
 
             try
             {
-                // If the user typed something, search that directly.
-                // If not, FoodApiService now rotates through Filipino-food terms itself.
-                var searchTerm = SearchEntry.Text?.Trim() ?? string.Empty;
+                var candidates = await _api.GetCandidatesAsync(remaining, number: 12);
 
-                var candidates = await _api.GetCandidatesAsync(Math.Max(remaining, 300), number: 12, searchTerm: searchTerm);
-
-                // Make a working copy for display; we may insert the selection reason into it later.
-                var displayCandidates = new List<FoodItem>(candidates);
-
-                // Gemini now ranks/confirms Filipino-familiarity rather than filtering
-                // a mostly-irrelevant list. Candidates already skew Filipino from the search step.
-                List<FoodItem> filtered = new List<FoodItem>(candidates);
-                try
+                if (candidates == null || !candidates.Any())
                 {
-                    if (candidates.Any())
-                    {
-                        var candidateSummary = string.Join("\n", candidates.Select(c => $"- {c.Title}"));
-                        var prompt = $@"
-You are helping a Filipino user find a meal after a long run can you recommend something like has nutrition for the runners no ice cream. Below is a list of food item titles.
-Identify which items are dishes/ingredients that are commonly eaten in the Philippines
-or are easily bought in Philippine grocery stores/wet markets (sari-sari stores, palengke, supermarkets).
-Exclude items that are clearly foreign/unfamiliar to a typical Filipino household (e.g. niche
-Middle Eastern, European, or US-branded specialty products) unless the item is a widely known
-international staple (e.g. plain rice, chicken, eggs).
-
-Respond ONLY with JSON, no other text, in this exact shape:
-{{""filipino"": [""<exact title from the list>"", ""...""]}}
-
-If none qualify, respond with {{""filipino"": []}}.
-
-Candidate items:
-{candidateSummary}
-";
-
-                        var geminiText = await _gemini.GenerateTextAsync(prompt);
-                        if (!string.IsNullOrWhiteSpace(geminiText))
-                        {
-                            var clean = geminiText.Replace("```json", "").Replace("```", "").Trim();
-                            try
-                            {
-                                var resp = JsonSerializer.Deserialize<FilipinoResponse>(clean, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-                                var set = new HashSet<string>(resp?.Filipino ?? Enumerable.Empty<string>(), StringComparer.OrdinalIgnoreCase);
-                                var matches = candidates.Where(c => set.Contains(c.Title)).ToList();
-                                if (matches.Any()) filtered = matches;
-                            }
-                            catch
-                            {
-                                // fall back to unfiltered (already Filipino-biased) candidates on parse errors
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                    // If Gemini fails, continue with the already Filipino-biased candidates
+                    PickLabel.Text = "No foods found. Try a different search.";
+                    CandidatesList.ItemsSource = new List<Models.FoodItem>();
+                    return;
                 }
 
-                var pick = _recommender.RecommendByCalories(filtered.Any() ? filtered : candidates, remaining);
-                if (pick is null)
+                var displayCandidates = new List<Models.FoodItem>(candidates);
+
+                Models.FoodItem pick = null;
+                var positive = candidates.Where(c => c.Calories > 0).ToList();
+                if (positive.Any())
                 {
-                    PickLabel.Text = "No recommendation available";
+                    var bestUnder = positive.Where(c => c.Calories <= remaining).OrderByDescending(c => c.Calories).FirstOrDefault();
+                    if (bestUnder != null)
+                        pick = bestUnder;
+                    else
+                        pick = positive.OrderBy(c => c.Calories).FirstOrDefault();
+                }
+
+                if (pick == null)
+                {
+                    PickLabel.Text = "No recommendation available.";
                 }
                 else
                 {
-                    PickLabel.Text = pick.Title;
+                    PickLabel.Text = $"Recommended: {pick.Title} ({pick.Calories} kcal)";
 
-                    // Insert the selection reason into the top of the candidates list so it's visible in the "Suggestion" section.
-                    var reasonItem = new FoodItem
+                    var reasonItem = new Models.FoodItem
                     {
-                        Title = $"Selected: {pick.Title}",
-                        Description = $"Selected because it fits your remaining {remaining} kcal budget (meal: {pick.Calories} kcal).",
+                        Title = pick.Title,
+                        Description = pick.Description,
                         Calories = pick.Calories,
-                        Measurement = pick.Measurement
+                        Measurement = pick.Measurement,
+                        NutrientsSummary = pick.NutrientsSummary,
+                        ImageUrl = pick.ImageUrl,
+                        Guidance = $"This fits your remaining {remaining} kcal budget."
                     };
 
-                    // place reason at the start of the displayed list
+                    var existingIdx = displayCandidates.FindIndex(d => string.Equals(d.Title?.Trim(), pick.Title?.Trim(), StringComparison.OrdinalIgnoreCase) && d.Calories == pick.Calories);
+                    if (existingIdx >= 0)
+                        displayCandidates.RemoveAt(existingIdx);
+
                     displayCandidates.Insert(0, reasonItem);
                 }
 
-                // Compute guidance for each displayed candidate so the user knows how much to eat to reach the remaining calories
                 foreach (var item in displayCandidates)
                 {
-                    if (!string.IsNullOrEmpty(item.Title) && item.Title.StartsWith("Selected: ", StringComparison.OrdinalIgnoreCase))
-                    {
-                        // show the reason text for the selected item
-                        item.Guidance = item.Description;
-                        continue;
-                    }
-
                     if (item.Calories <= 0)
                     {
                         item.Guidance = string.IsNullOrEmpty(item.Measurement) ? string.Empty : $"Typical serving: {item.Measurement}";
@@ -134,14 +244,127 @@ Candidate items:
 
                     var servingsNeeded = remaining / (double)item.Calories;
                     var perServing = $"1 serving = {item.Calories} kcal" + (string.IsNullOrEmpty(item.Measurement) ? string.Empty : $" ({item.Measurement})");
-                    if (servingsNeeded >= 1.0)
+                    item.Guidance = perServing;
+                }
+
+                CandidatesList.ItemsSource = displayCandidates;
+                // update totals after any change
+                _ = UpdateTotalCaloriesAsync();
+            }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", ex.Message, "OK");
+                PickLabel.Text = string.Empty;
+            }
+        }
+
+        private async void OnAddToMealClicked(object sender, EventArgs e)
+        {
+            if (sender is Button b && b.BindingContext is FoodItem item)
+            {
+                MealType type;
+                if (_targetMealType.HasValue)
+                {
+                    type = _targetMealType.Value;
+                }
+                else
+                {
+                    var choice = await DisplayActionSheet("Add to meal", "Cancel", null, "Breakfast", "Lunch", "Dinner", "Snack");
+                    if (string.IsNullOrEmpty(choice) || choice == "Cancel") return;
+                    type = MealType.Breakfast;
+                    switch (choice)
                     {
-                        item.Guidance = $"{perServing}. To use {remaining} kcal: {servingsNeeded:0.##} servings.";
+                        case "Lunch": type = MealType.Lunch; break;
+                        case "Dinner": type = MealType.Dinner; break;
+                        case "Snack": type = MealType.Snack; break;
                     }
-                    else if (servingsNeeded >= 0.01)
+                }
+
+                var store = MauiProgram.Services.GetService(typeof(RunWise.Services.MealStore)) as RunWise.Services.MealStore ?? new RunWise.Services.MealStore();
+                var meal = new RunWise.Models.MealItem
+                {
+                    Name = item.Title ?? "Food",
+                    Calories = item.Calories > 0 ? item.Calories : 0,
+                    Type = type,
+                    Quantity = 1,
+                    Date = this.FindByName<DatePicker>("DatePicker")?.Date ?? DateTime.Today
+                };
+
+                await store.AddMealAsync(meal);
+
+                // Try server sync and inform the user if it fails
+                try
+                {
+                    var sup = MauiProgram.Services.GetService(typeof(SupabaseDatabaseService)) as SupabaseDatabaseService;
+                    if (sup != null)
                     {
-                        // less than one serving but non-trivial
-                        item.Guidance = $"{perServing}. To use {remaining} kcal: {servingsNeeded:0.##} of a serving.";
+                        var (ok, err) = await sup.CreateMealAsync(meal);
+                        if (!ok)
+                        {
+                            await DisplayAlert("Saved locally", $"Meal saved locally but server sync failed: {err}", "OK");
+                            return;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await DisplayAlert("Saved locally", $"Meal saved locally but server sync failed: {ex.Message}", "OK");
+                    return;
+                }
+
+                await DisplayAlert("Added", "Added to Meal Planner", "OK");
+            }
+        }
+
+        private async System.Threading.Tasks.Task RecommendForQuery(string query)
+        {
+            PickLabel.Text = "Loading...";
+            CandidatesList.ItemsSource = null;
+
+            try
+            {
+                var candidates = await _api.GetCandidatesAsync(0, number: 12, searchTerm: query);
+
+                if (candidates == null || !candidates.Any())
+                {
+                    PickLabel.Text = "No foods found. Try a different search.";
+                    CandidatesList.ItemsSource = new List<Models.FoodItem>();
+                    return;
+                }
+
+                var displayCandidates = new List<Models.FoodItem>(candidates);
+                var pick = displayCandidates.FirstOrDefault();
+                if (pick == null)
+                {
+                    PickLabel.Text = "No recommendation available.";
+                }
+                else
+                {
+                    PickLabel.Text = $"Recommended: {pick.Title} ({pick.Calories} kcal)";
+                    var reasonItem = new Models.FoodItem
+                    {
+                        Title = pick.Title,
+                        Description = pick.Description,
+                        Calories = pick.Calories,
+                        Measurement = pick.Measurement,
+                        NutrientsSummary = pick.NutrientsSummary,
+                        ImageUrl = pick.ImageUrl,
+                        Guidance = string.IsNullOrEmpty(pick.Measurement) ? string.Empty : $"Typical serving: {pick.Measurement}"
+                    };
+
+                    var existingIdx = displayCandidates.FindIndex(d => string.Equals(d.Title?.Trim(), pick.Title?.Trim(), StringComparison.OrdinalIgnoreCase) && d.Calories == pick.Calories);
+                    if (existingIdx >= 0)
+                        displayCandidates.RemoveAt(existingIdx);
+
+                    displayCandidates.Insert(0, reasonItem);
+                }
+
+                foreach (var item in displayCandidates)
+                {
+                    var perServing = item.Calories > 0 ? $"1 serving = {item.Calories} kcal" : string.Empty;
+                    if (!string.IsNullOrEmpty(item.Measurement))
+                    {
+                        item.Guidance = string.IsNullOrEmpty(perServing) ? $"Typical serving: {item.Measurement}" : $"{perServing} ({item.Measurement})";
                     }
                     else
                     {
@@ -150,6 +373,8 @@ Candidate items:
                 }
 
                 CandidatesList.ItemsSource = displayCandidates;
+                // update totals after any change
+                _ = UpdateTotalCaloriesAsync();
             }
             catch (Exception ex)
             {
@@ -157,11 +382,25 @@ Candidate items:
                 PickLabel.Text = string.Empty;
             }
         }
-    }
+        // Test API button removed - relying solely on production recommendation flow
 
-    // Used to deserialize Gemini's JSON reply: {"filipino": ["title1", "title2", ...]}
-    public class FilipinoResponse
-    {
-        public List<string> Filipino { get; set; } = new();
+        private async System.Threading.Tasks.Task UpdateTotalCaloriesAsync()
+        {
+            try
+            {
+                var meals = await _mealStore.GetMealsForDateAsync(DateTime.Today);
+                var total = meals.Sum(m => m.Calories * (int)Math.Max(1, Math.Round(m.Quantity)));
+                Device.BeginInvokeOnMainThread(() =>
+                {
+                    try
+                    {
+                        var lbl = this.FindByName<Label>("TotalCaloriesLabel");
+                        if (lbl != null) lbl.Text = $"{total} kcal";
+                    }
+                    catch { }
+                });
+            }
+            catch { }
+        }
     }
 }

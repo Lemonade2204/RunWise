@@ -1,5 +1,7 @@
 using System.Globalization;
 using RunWise.ViewModels;
+using Microsoft.Maui.ApplicationModel;
+using System.Threading.Tasks;
 
 namespace RunWise.Pages;
 
@@ -28,7 +30,44 @@ public partial class MapPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.StartLocationUpdates();
+        await RequestPermissionAndStartAsync();
+    }
+
+    private async Task RequestPermissionAndStartAsync()
+    {
+        try
+        {
+            var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+            if (status != PermissionStatus.Granted)
+            {
+                // Show rationale if needed
+                if (Permissions.ShouldShowRationale<Permissions.LocationWhenInUse>())
+                {
+                    var allow = await DisplayAlert("Location required", "This app needs access to your location to show your position on the map.", "Allow", "Cancel");
+                    if (!allow)
+                        return;
+                }
+
+                status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+            }
+
+            if (status == PermissionStatus.Granted)
+            {
+                await _viewModel.StartLocationUpdates();
+            }
+            else
+            {
+                var open = await DisplayAlert("Permission denied", "Location permission was denied. Open app settings to enable it?", "Open Settings", "Cancel");
+                if (open)
+                {
+                    AppInfo.ShowSettingsUI();
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Permission request error: {ex.Message}");
+        }
     }
 
     protected override async void OnDisappearing()

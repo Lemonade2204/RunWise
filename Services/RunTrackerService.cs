@@ -27,6 +27,14 @@ public class RunTrackerService
         }
     }
 
+    private DateTime EnsureUtc(DateTime dt)
+    {
+        if (dt.Kind == DateTimeKind.Utc) return dt;
+        if (dt.Kind == DateTimeKind.Local) return dt.ToUniversalTime();
+        // Unspecified: treat as local then convert
+        return DateTime.SpecifyKind(dt, DateTimeKind.Local).ToUniversalTime();
+    }
+
     public async Task SaveRunAsync(RunSession run)
     {
         try
@@ -41,7 +49,7 @@ public class RunTrackerService
             catch { }
             allRuns.Add(run);
 
-            var json = JsonSerializer.Serialize(allRuns, new JsonSerializerOptions { WriteIndented = true });
+            var json = JsonSerializer.Serialize(allRuns, new JsonSerializerOptions { WriteIndented = true, PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
             await File.WriteAllTextAsync(_dataPath, json);
             // Also try to sync to Supabase if available
             try
@@ -97,6 +105,8 @@ public class RunTrackerService
                             Duration = TimeSpan.FromSeconds(r.DurationSeconds),
                             DistanceMeters = r.DistanceKm * 1000
                         };
+                        // map steps and calories when present
+                        try { session.Steps = r.Steps; session.Calories = Convert.ToInt32(r.Calories); } catch { }
                         // set owner id if available
                         try { session.UserId = r.UserId.ToString(); } catch { }
                         // map route points if present
@@ -106,6 +116,21 @@ public class RunTrackerService
                         }
                         return session;
                     }).OrderByDescending(r => r.StartTime).ToList();
+                    // Ensure StartTime/EndTime are converted to local time for display
+                    foreach (var s in list)
+                    {
+                        try
+                        {
+                            s.StartTime = DateTime.SpecifyKind(s.StartTime, DateTimeKind.Utc).ToLocalTime();
+                        }
+                        catch { }
+                        try
+                        {
+                            if (s.EndTime.HasValue)
+                                s.EndTime = DateTime.SpecifyKind(s.EndTime.Value, DateTimeKind.Utc).ToLocalTime();
+                        }
+                        catch { }
+                    }
                     return list;
                 }
             }
@@ -125,6 +150,13 @@ public class RunTrackerService
                 }
             }
             catch { }
+
+            // Treat stored times as UTC and convert to local for display
+            foreach (var s in runsLocal)
+            {
+                try { s.StartTime = DateTime.SpecifyKind(s.StartTime, DateTimeKind.Utc).ToLocalTime(); } catch { }
+                try { if (s.EndTime.HasValue) s.EndTime = DateTime.SpecifyKind(s.EndTime.Value, DateTimeKind.Utc).ToLocalTime(); } catch { }
+            }
 
             return runsLocal.OrderByDescending(r => r.StartTime).ToList();
         }
@@ -159,6 +191,13 @@ public class RunTrackerService
                 allRuns[idx] = run;
             else
                 allRuns.Add(run);
+
+            // Normalize times to UTC for storage
+            foreach (var s in allRuns)
+            {
+                try { s.StartTime = EnsureUtc(s.StartTime); } catch { }
+                try { if (s.EndTime.HasValue) s.EndTime = EnsureUtc(s.EndTime.Value); } catch { }
+            }
 
             var json = JsonSerializer.Serialize(allRuns, new JsonSerializerOptions { WriteIndented = true });
             await File.WriteAllTextAsync(_dataPath, json);
@@ -201,6 +240,13 @@ public class RunTrackerService
         {
             var allRuns = await GetAllRunsAsync();
             allRuns.RemoveAll(r => r.Id == id);
+
+            // Normalize times to UTC for storage
+            foreach (var s in allRuns)
+            {
+                try { s.StartTime = EnsureUtc(s.StartTime); } catch { }
+                try { if (s.EndTime.HasValue) s.EndTime = EnsureUtc(s.EndTime.Value); } catch { }
+            }
 
             var json = JsonSerializer.Serialize(allRuns, new JsonSerializerOptions { WriteIndented = true });
             await File.WriteAllTextAsync(_dataPath, json);

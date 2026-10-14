@@ -154,6 +154,13 @@ public partial class RunViewModel : ObservableObject
 		{
 			_currentRun.Duration = _stopwatch.Elapsed;
 			_currentRun.EndTime = DateTime.UtcNow;
+
+			// Estimate steps and calories based on distance if not set by sensors
+			var km = _currentRun.DistanceMeters / 1000.0;
+			// average steps per km ~1300, calories burned per km ~62 (approx)
+			_currentRun.Steps = (int)Math.Round(km * 1300.0);
+			_currentRun.Calories = (int)Math.Round(km * 62.0);
+
 			await _trackerService.SaveRunAsync(_currentRun);
 
 			RunHistory.Insert(0, _currentRun);

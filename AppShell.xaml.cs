@@ -12,6 +12,8 @@ namespace RunWise
             Routing.RegisterRoute("rundetails", typeof(Pages.RunDetailsPage));
             Routing.RegisterRoute("login", typeof(Pages.LoginPage));
             Routing.RegisterRoute("register", typeof(Pages.RegisterPage));
+            Routing.RegisterRoute("runfood", typeof(Pages.RunFoodRecommendationPage));
+            Routing.RegisterRoute("mealplanner", typeof(Pages.MealPlannerPage));
         }
     }
 }

@@ -74,6 +74,26 @@ build_metadata.AdditionalFiles.NoWarn =
 build_metadata.AdditionalFiles.EnableDiagnostics = 
 build_metadata.AdditionalFiles.LineInfo = 
 
+[C:/Users/lemue/source/repos/RunWise/RunWise/Pages/ExerciseDetailPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = RunWise.Pages.ExerciseDetailPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Pages\ExerciseDetailPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Pages\ExerciseDetailPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/lemue/source/repos/RunWise/RunWise/Pages/ExercisesPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = RunWise.Pages.ExercisesPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Pages\ExercisesPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Pages\ExercisesPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
 [C:/Users/lemue/source/repos/RunWise/RunWise/Pages/FoodRecommendationPage.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = RunWise.Pages.FoodRecommendationPage.xaml
@@ -124,6 +144,16 @@ build_metadata.AdditionalFiles.NoWarn =
 build_metadata.AdditionalFiles.EnableDiagnostics = 
 build_metadata.AdditionalFiles.LineInfo = 
 
+[C:/Users/lemue/source/repos/RunWise/RunWise/Pages/MealPlannerPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = RunWise.Pages.MealPlannerPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Pages\MealPlannerPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Pages\MealPlannerPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
 [C:/Users/lemue/source/repos/RunWise/RunWise/Pages/ProfilePage.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = RunWise.Pages.ProfilePage.xaml
@@ -154,11 +184,31 @@ build_metadata.AdditionalFiles.NoWarn =
 build_metadata.AdditionalFiles.EnableDiagnostics = 
 build_metadata.AdditionalFiles.LineInfo = 
 
+[C:/Users/lemue/source/repos/RunWise/RunWise/Pages/RunFoodRecommendationPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = RunWise.Pages.RunFoodRecommendationPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Pages\RunFoodRecommendationPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Pages\RunFoodRecommendationPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
 [C:/Users/lemue/source/repos/RunWise/RunWise/Pages/RunPage.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = RunWise.Pages.RunPage.xaml
 build_metadata.AdditionalFiles.TargetPath = Pages\RunPage.xaml
 build_metadata.AdditionalFiles.RelativePath = Pages\RunPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/lemue/source/repos/RunWise/RunWise/Pages/WorkoutPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = RunWise.Pages.WorkoutPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Pages\WorkoutPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Pages\WorkoutPage.xaml
 build_metadata.AdditionalFiles.Inflator = SourceGen
 build_metadata.AdditionalFiles.NoWarn = 
 build_metadata.AdditionalFiles.EnableDiagnostics = 

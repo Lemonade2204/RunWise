@@ -59,4 +59,32 @@ public partial class LoginPage : ContentPage
 		// Push the register page on the navigation stack
 		await Navigation.PushAsync(new RegisterPage());
 	}
+
+	private async void OnForgotPasswordTapped(object? sender, EventArgs e)
+	{
+		// Prefer the email already entered, otherwise prompt the user
+		var current = EmailEntry.Text?.Trim();
+		string? email = current;
+		if (string.IsNullOrWhiteSpace(email))
+		{
+			email = await DisplayPromptAsync("Reset password", "Enter your email to receive reset instructions", "Send", "Cancel", "Email", -1, Keyboard.Email);
+			if (string.IsNullOrWhiteSpace(email))
+				return; // cancelled or empty
+		}
+
+		BusyIndicator.IsVisible = true;
+		BusyIndicator.IsRunning = true;
+		var (success, error) = await _authService.SendPasswordResetAsync(email!);
+		BusyIndicator.IsRunning = false;
+		BusyIndicator.IsVisible = false;
+
+		if (success)
+		{
+			await DisplayAlert("Password reset", "If the email exists, a password reset link has been sent.", "OK");
+		}
+		else
+		{
+			await DisplayAlert("Password reset failed", error ?? "Unknown error", "OK");
+		}
+	}
 }

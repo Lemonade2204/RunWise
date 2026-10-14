@@ -5,12 +5,18 @@
              Title="Food Recommendation">
 
     <VerticalStackLayout Padding="20" Spacing="12">
-        <Label Text="Search (optional, e.g. 'adobo', 'rice', 'Filipino'):" />
-        <Entry x:Name="SearchEntry" Placeholder="e.g. adobo" />
-        <Label Text="Enter remaining calories:" />
-        <Entry x:Name="CaloriesEntry" Placeholder="e.g. 500" Keyboard="Numeric" />
-        <Button Text="Get Recommendation" Clicked="OnGetRecommendationClicked" />
+        
+        <HorizontalStackLayout Spacing="8" VerticalOptions="Start">
+            <Label x:Name="TargetMealLabel" Text="Food" FontAttributes="Bold" VerticalOptions="Center" />
+            <Picker x:Name="MealTypePicker" Title="Meal" WidthRequest="150" />
+            <Label x:Name="TotalCaloriesLabel" Text="0 kcal" HorizontalOptions="EndAndExpand" VerticalOptions="Center" />
+        </HorizontalStackLayout>
 
+        <Label Text="Enter food to search:" />
+        <Entry x:Name="CaloriesEntry" Placeholder="e.g. pancit canton" />
+
+        <Button Text="Get Recommendation" Clicked="OnGetRecommendationClicked" />
+       
         <Frame CornerRadius="6" Padding="10" BackgroundColor="#F2F2F2">
             <VerticalStackLayout>
                 <Label x:Name="PickLabel" FontAttributes="Bold" />
@@ -42,6 +48,7 @@
 
                             <VerticalStackLayout Grid.Column="1" HorizontalOptions="End" VerticalOptions="Center" Spacing="2">
                                 <Label Text="{Binding CaloriesDisplay}" HorizontalTextAlignment="End" />
+                                <Button Text="Add" Clicked="OnAddToMealClicked" FontSize="Small" />
                             </VerticalStackLayout>
                         </Grid>
                     </Frame>

@@ -2,46 +2,399 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RunWise.Pages.ProfilePage"
-             Title="ProfilePage">
+             Title="ProfilePage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#F8F9FC">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+
+            <Color x:Key="Primary">#4A6CF7</Color>
+            <Color x:Key="PrimaryDark">#3550D4</Color>
+            <Color x:Key="PrimarySoft">#E8EDFF</Color>
+            <Color x:Key="TextDark">#1B2237</Color>
+            <Color x:Key="TextMuted">#9AA3B5</Color>
+            <Color x:Key="DividerColor">#F0F2F7</Color>
+            <Color x:Key="TileBackground">#F6F8FC</Color>
+            <Color x:Key="Danger">#EF5B65</Color>
+
+            <Style x:Key="Card" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="Stroke" Value="Transparent" />
+                <Setter Property="StrokeThickness" Value="1.5" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 20" />
+                <Setter Property="Padding" Value="0" />
+                <Setter Property="Shadow">
+                    <Setter.Value>
+                        <Shadow Brush="Black" Opacity="0.06" Radius="12" Offset="0,4" />
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="SectionTitle" TargetType="Label">
+                <Setter Property="TextColor" Value="{StaticResource TextDark}" />
+                <Setter Property="FontSize" Value="17" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+
+            <Style x:Key="KeyLabel" TargetType="Label">
+                <Setter Property="TextColor" Value="{StaticResource TextMuted}" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+
+            <Style x:Key="ValueLabel" TargetType="Label">
+                <Setter Property="TextColor" Value="{StaticResource TextDark}" />
+                <Setter Property="FontSize" Value="15" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="HorizontalTextAlignment" Value="End" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+
+            <Style x:Key="UnitLabel" TargetType="Label">
+                <Setter Property="TextColor" Value="{StaticResource TextMuted}" />
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="Margin" Value="4,0,0,0" />
+            </Style>
+
+            <Style x:Key="InlineEntry" TargetType="Entry">
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="TextColor" Value="{StaticResource TextDark}" />
+                <Setter Property="FontSize" Value="15" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="HorizontalTextAlignment" Value="End" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+
+            <Style x:Key="Divider" TargetType="BoxView">
+                <Setter Property="HeightRequest" Value="1" />
+                <Setter Property="Color" Value="{StaticResource DividerColor}" />
+            </Style>
+
+            <Style x:Key="PillButton" TargetType="Button">
+                <Setter Property="BackgroundColor" Value="{StaticResource PrimarySoft}" />
+                <Setter Property="TextColor" Value="{StaticResource Primary}" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="CornerRadius" Value="18" />
+                <Setter Property="HeightRequest" Value="36" />
+                <Setter Property="Padding" Value="16,0" />
+            </Style>
+
+            <!-- Statistics tiles -->
+            <Style x:Key="StatTile" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource TileBackground}" />
+                <Setter Property="Stroke" Value="Transparent" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 14" />
+                <Setter Property="Padding" Value="14,12" />
+            </Style>
+
+            <Style x:Key="StatKey" TargetType="Label">
+                <Setter Property="TextColor" Value="{StaticResource TextMuted}" />
+                <Setter Property="FontSize" Value="12" />
+            </Style>
+
+            <Style x:Key="StatValue" TargetType="Label">
+                <Setter Property="TextColor" Value="{StaticResource TextDark}" />
+                <Setter Property="FontSize" Value="17" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="Text" Value="-" />
+            </Style>
+
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="12">
-            <Label Text="Profile" FontSize="24" HorizontalOptions="Center" />
+        <VerticalStackLayout Spacing="0">
 
-            <Label Text="Email (Gmail)" />
-            <Label x:Name="EmailLabel" />
+            <!-- ================= HEADER ================= -->
+            <Border Stroke="Transparent"
+                    StrokeShape="RoundRectangle 0,0,28,28"
+                    Padding="24,56,24,24">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="{StaticResource Primary}" Offset="0" />
+                        <GradientStop Color="{StaticResource PrimaryDark}" Offset="1" />
+                    </LinearGradientBrush>
+                </Border.Background>
 
-            <Label Text="Name" />
-            <Entry x:Name="NameEntry" Placeholder="Your name" IsEnabled="False" />
-
-            <Label Text="Weight (kg)" />
-            <Entry x:Name="WeightEntry" Keyboard="Numeric" Placeholder="e.g. 70" IsEnabled="False" />
-
-            <Label Text="Height (cm)" />
-            <Entry x:Name="HeightEntry" Keyboard="Numeric" Placeholder="e.g. 175" IsEnabled="False" />
-
-            <HorizontalStackLayout Spacing="12" HorizontalOptions="Center">
-                <Button x:Name="EditButton" Text="Edit" Clicked="OnEditClicked" />
-                <Button x:Name="SaveButton" Text="Save" Clicked="OnSaveClicked" IsVisible="False" />
-                <Button x:Name="CancelButton" Text="Cancel" Clicked="OnCancelClicked" IsVisible="False" />
-            </HorizontalStackLayout>
-
-            <Frame Padding="10" CornerRadius="6" BorderColor="#DDD">
-                <VerticalStackLayout>
-                    <Label Text="This Week (avg)" FontAttributes="Bold" />
-                    <Label x:Name="WeeklyDistanceLabel" Text="Distance: -" />
-                    <Label x:Name="WeeklyTimeLabel" Text="Time: -" />
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="PROFILE" TextColor="#B3FFFFFF"
+                           FontSize="12" FontAttributes="Bold" CharacterSpacing="2" />
+                    <Label x:Name="HeaderNameLabel" Text="Your name"
+                           TextColor="White" FontSize="28" FontAttributes="Bold"
+                           LineBreakMode="TailTruncation" />
+                    <Label x:Name="HeaderEmailLabel" Text=""
+                           TextColor="#CCFFFFFF" FontSize="14"
+                           LineBreakMode="TailTruncation" />
+                    <Label x:Name="HeaderDetailsLabel" Text=""
+                           TextColor="#CCFFFFFF" FontSize="13"
+                           IsVisible="False" Margin="0,2,0,0" />
                 </VerticalStackLayout>
-            </Frame>
+            </Border>
 
-            <Frame Padding="10" CornerRadius="6" BorderColor="#DDD">
-                <VerticalStackLayout>
-                    <Label Text="All Time" FontAttributes="Bold" />
-                    <Label x:Name="AllTimeDistanceLabel" Text="Distance: -" />
-                    <Label x:Name="AllTimeTimeLabel" Text="Time: -" />
-                </VerticalStackLayout>
-            </Frame>
+            <!-- ================= BODY ================= -->
+            <VerticalStackLayout Padding="16,20,16,32" Spacing="16">
 
-            <Button x:Name="LogoutButton" Text="Log Out" Clicked="OnLogoutClicked" HorizontalOptions="Center" Margin="0,20,0,0" />
+                <!-- Summary cards -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+
+                    <Border Grid.Column="0" Style="{StaticResource Card}" Padding="16">
+                        <VerticalStackLayout Spacing="4">
+                            <HorizontalStackLayout Spacing="8" Margin="0,0,0,6">
+                                <Border WidthRequest="32" HeightRequest="32"
+                                        BackgroundColor="#EEF1FF" Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 10">
+                                    <Label Text="📈" FontSize="15"
+                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                                <Label Text="This Week" TextColor="{StaticResource TextDark}"
+                                       FontSize="15" FontAttributes="Bold" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                            <Label x:Name="WeeklyDistanceLabel" Text="-"
+                                   TextColor="{StaticResource TextDark}"
+                                   FontSize="22" FontAttributes="Bold" />
+                            <Label x:Name="WeeklyTimeLabel" Text="No runs yet"
+                                   TextColor="{StaticResource TextMuted}" FontSize="13" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Column="1" Style="{StaticResource Card}" Padding="16">
+                        <VerticalStackLayout Spacing="4">
+                            <HorizontalStackLayout Spacing="8" Margin="0,0,0,6">
+                                <Border WidthRequest="32" HeightRequest="32"
+                                        BackgroundColor="#FFF3E3" Stroke="Transparent"
+                                        StrokeShape="RoundRectangle 10">
+                                    <Label Text="🏆" FontSize="15"
+                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                                <Label Text="All Time" TextColor="{StaticResource TextDark}"
+                                       FontSize="15" FontAttributes="Bold" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                            <Label x:Name="AllTimeDistanceLabel" Text="-"
+                                   TextColor="{StaticResource TextDark}"
+                                   FontSize="22" FontAttributes="Bold" />
+                            <Label x:Name="AllTimeTimeLabel" Text="No runs yet"
+                                   TextColor="{StaticResource TextMuted}" FontSize="13" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- Personal info -->
+                <Border x:Name="PersonalInfoCard" Style="{StaticResource Card}">
+                    <VerticalStackLayout>
+
+                        <Grid ColumnDefinitions="*,Auto" Padding="20,14">
+                            <Label Text="Personal Info" Style="{StaticResource SectionTitle}" />
+                            <HorizontalStackLayout Grid.Column="1" Spacing="8" VerticalOptions="Center">
+                                <Button x:Name="EditButton" Text="✎  Edit"
+                                        Style="{StaticResource PillButton}"
+                                        Clicked="OnEditClicked" />
+                                <Button x:Name="CancelButton" Text="Cancel"
+                                        Style="{StaticResource PillButton}"
+                                        Clicked="OnCancelClicked" IsVisible="False" />
+                                <Button x:Name="SaveButton" Text="Save"
+                                        Style="{StaticResource PillButton}"
+                                        BackgroundColor="{StaticResource Primary}" TextColor="White"
+                                        Clicked="OnSaveClicked" IsVisible="False" />
+                            </HorizontalStackLayout>
+                        </Grid>
+                        <BoxView Style="{StaticResource Divider}" />
+
+                        <VerticalStackLayout Padding="20,0,20,6">
+
+                            <Grid ColumnDefinitions="110,*" Padding="0,14">
+                                <Label Text="Email" Style="{StaticResource KeyLabel}" />
+                                <Label x:Name="EmailLabel" Grid.Column="1"
+                                       Style="{StaticResource ValueLabel}"
+                                       LineBreakMode="TailTruncation" />
+                            </Grid>
+                            <BoxView Style="{StaticResource Divider}" />
+
+                            <Grid ColumnDefinitions="110,*" Padding="0,2">
+                                <Label Text="Name" Style="{StaticResource KeyLabel}" />
+                                <Entry x:Name="NameEntry" Grid.Column="1"
+                                       Style="{StaticResource InlineEntry}"
+                                       Placeholder="Your name" IsEnabled="False" />
+                            </Grid>
+                            <BoxView Style="{StaticResource Divider}" />
+
+                            <Grid ColumnDefinitions="110,*,Auto" Padding="0,2">
+                                <Label Text="Weight" Style="{StaticResource KeyLabel}" />
+                                <Entry x:Name="WeightEntry" Grid.Column="1"
+                                       Style="{StaticResource InlineEntry}"
+                                       Keyboard="Numeric" Placeholder="-" IsEnabled="False" />
+                                <Label Grid.Column="2" Text="kg" Style="{StaticResource UnitLabel}" />
+                            </Grid>
+                            <BoxView Style="{StaticResource Divider}" />
+
+                            <Grid ColumnDefinitions="110,*,Auto" Padding="0,2">
+                                <Label Text="Height" Style="{StaticResource KeyLabel}" />
+                                <Entry x:Name="HeightEntry" Grid.Column="1"
+                                       Style="{StaticResource InlineEntry}"
+                                       Keyboard="Numeric" Placeholder="-" IsEnabled="False" />
+                                <Label Grid.Column="2" Text="cm" Style="{StaticResource UnitLabel}" />
+                            </Grid>
+                            <BoxView Style="{StaticResource Divider}" />
+
+                            <Grid ColumnDefinitions="110,*" Padding="0,2">
+                                <Label Text="Date of Birth" Style="{StaticResource KeyLabel}" />
+                                <DatePicker x:Name="DobPicker" Grid.Column="1"
+                                            HorizontalOptions="End" VerticalOptions="Center"
+                                            TextColor="{StaticResource TextDark}"
+                                            FontSize="15" FontAttributes="Bold"
+                                            Format="MMMM d, yyyy"
+                                            Date="2000-01-01" IsEnabled="False" />
+                            </Grid>
+                            <BoxView Style="{StaticResource Divider}" />
+
+                            <Grid ColumnDefinitions="110,*" Padding="0,2">
+                                <Label Text="Gender" Style="{StaticResource KeyLabel}" />
+                                <Picker x:Name="GenderPicker" Grid.Column="1"
+                                        HorizontalTextAlignment="End" VerticalOptions="Center"
+                                        TextColor="{StaticResource TextDark}"
+                                        FontSize="15" FontAttributes="Bold"
+                                        Title="Select gender" IsEnabled="False">
+                                    <Picker.Items>
+                                        <x:String>Male</x:String>
+                                        <x:String>Female</x:String>
+                                        <x:String>Other</x:String>
+                                        <x:String>Prefer not to say</x:String>
+                                    </Picker.Items>
+                                </Picker>
+                            </Grid>
+
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Statistics -->
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout>
+
+                        <Grid ColumnDefinitions="*,Auto" Padding="20,14">
+                            <Label Text="Statistics" Style="{StaticResource SectionTitle}" />
+                            <Border Grid.Column="1"
+                                    BackgroundColor="{StaticResource PrimarySoft}"
+                                    Stroke="Transparent" StrokeShape="RoundRectangle 18"
+                                    HeightRequest="36" Padding="14,0" VerticalOptions="Center">
+                                <HorizontalStackLayout Spacing="4">
+                                    <Picker x:Name="RangePicker" Title="Select range"
+                                            TextColor="{StaticResource Primary}"
+                                            TitleColor="{StaticResource Primary}"
+                                            FontSize="14" FontAttributes="Bold"
+                                            VerticalOptions="Center">
+                                        <Picker.Items>
+                                            <x:String>All Time</x:String>
+                                            <x:String>This Month</x:String>
+                                            <x:String>This Week</x:String>
+                                        </Picker.Items>
+                                    </Picker>
+                                    <Label Text="⌄" TextColor="{StaticResource Primary}"
+                                           FontSize="14" VerticalOptions="Center"
+                                           InputTransparent="True" />
+                                </HorizontalStackLayout>
+                            </Border>
+                        </Grid>
+                        <BoxView Style="{StaticResource Divider}" />
+
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+                              ColumnSpacing="10" RowSpacing="10" Padding="16">
+
+                            <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource StatTile}">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Runs" Style="{StaticResource StatKey}" />
+                                    <Label x:Name="StatTotalRuns" Style="{StaticResource StatValue}" />
+                                </VerticalStackLayout>
+                            </Border>
+                            <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource StatTile}">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Total time" Style="{StaticResource StatKey}" />
+                                    <Label x:Name="StatTotalHours" Style="{StaticResource StatValue}" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource StatTile}">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Total distance" Style="{StaticResource StatKey}" />
+                                    <Label x:Name="StatTotalKm" Style="{StaticResource StatValue}" />
+                                </VerticalStackLayout>
+                            </Border>
+                            <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource StatTile}">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Avg speed" Style="{StaticResource StatKey}" />
+                                    <Label x:Name="StatAvgPace" Style="{StaticResource StatValue}" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Grid.Row="2" Grid.Column="0" Style="{StaticResource StatTile}">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Avg distance / run" Style="{StaticResource StatKey}" />
+                                    <Label x:Name="StatAvgKmPerRun" Style="{StaticResource StatValue}" />
+                                </VerticalStackLayout>
+                            </Border>
+                            <Border Grid.Row="2" Grid.Column="1" Style="{StaticResource StatTile}">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Avg time / run" Style="{StaticResource StatKey}" />
+                                    <Label x:Name="StatAvgHoursPerRun" Style="{StaticResource StatValue}" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Grid.Row="3" Grid.Column="0" Style="{StaticResource StatTile}">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Longest run" Style="{StaticResource StatKey}" />
+                                    <Label x:Name="StatLongestRun" Style="{StaticResource StatValue}" />
+                                </VerticalStackLayout>
+                            </Border>
+                            <Border Grid.Row="3" Grid.Column="1" Style="{StaticResource StatTile}">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Longest duration" Style="{StaticResource StatKey}" />
+                                    <Label x:Name="StatLongestDuration" Style="{StaticResource StatValue}" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Grid.Row="4" Grid.Column="0" Style="{StaticResource StatTile}">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Best speed" Style="{StaticResource StatKey}" />
+                                    <Label x:Name="StatBestPace" Style="{StaticResource StatValue}" />
+                                </VerticalStackLayout>
+                            </Border>
+                            <Border Grid.Row="4" Grid.Column="1" Style="{StaticResource StatTile}">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Calories" Style="{StaticResource StatKey}" />
+                                    <Label x:Name="StatTotalCalories" Style="{StaticResource StatValue}" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                            <Border Grid.Row="5" Grid.Column="0" Style="{StaticResource StatTile}">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Total steps" Style="{StaticResource StatKey}" />
+                                    <Label x:Name="StatTotalSteps" Style="{StaticResource StatValue}" />
+                                </VerticalStackLayout>
+                            </Border>
+                            <Border Grid.Row="5" Grid.Column="1" Style="{StaticResource StatTile}">
+                                <VerticalStackLayout Spacing="2">
+                                    <Label Text="Avg steps / run" Style="{StaticResource StatKey}" />
+                                    <Label x:Name="StatAvgStepsPerRun" Style="{StaticResource StatValue}" />
+                                </VerticalStackLayout>
+                            </Border>
+
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Button x:Name="LogoutButton" Text="Log Out"
+                        Clicked="OnLogoutClicked"
+                        BackgroundColor="White"
+                        TextColor="{StaticResource Danger}"
+                        BorderColor="#FBD9DC" BorderWidth="2"
+                        CornerRadius="20" HeightRequest="56"
+                        FontSize="16" FontAttributes="Bold"
+                        Margin="0,4,0,0" />
+
+            </VerticalStackLayout>
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

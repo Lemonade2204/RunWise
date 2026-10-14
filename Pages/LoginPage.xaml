@@ -2,44 +2,79 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="RunWise.Pages.LoginPage"
-             Title="Log In"
-             BackgroundColor="White">
+             NavigationPage.HasNavigationBar="False"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#4A67F2">
 
     <ScrollView>
-        <VerticalStackLayout Padding="30" Spacing="16" VerticalOptions="Center">
+        <VerticalStackLayout Padding="36" Spacing="12" VerticalOptions="Center" HorizontalOptions="Center">
 
-       
-            <Label Text="RunWise"
-                   FontSize="28"
+            <!-- App title -->
+            <Label Text="RUNWISE"
+                   FontSize="26"
                    FontAttributes="Bold"
                    HorizontalOptions="Center"
-                   Margin="0,0,0,20" />
+                   TextColor="White" />
 
-            <Entry x:Name="EmailEntry"
-                   Placeholder="Email"
-                   Keyboard="Email" />
+            <Label Text="Intelligent Running Assistant"
+                   FontSize="12"
+                   HorizontalOptions="Center"
+                   TextColor="#DCE5FF"
+                   Margin="0,0,0,12" />
 
-            <Entry x:Name="PasswordEntry"
-                   Placeholder="Password"
-                   IsPassword="True" />
+            <!-- Email field with rounded background -->
+            <Frame CornerRadius="24" HasShadow="False" BackgroundColor="#6A84FF" Padding="12" WidthRequest="320">
+                <Entry x:Name="EmailEntry"
+                       Placeholder="Enter your email"
+                       PlaceholderColor="#DDE8FF"
+                       Keyboard="Email"
+                       BackgroundColor="Transparent"
+                       TextColor="White" />
+            </Frame>
+
+            <!-- Password field -->
+            <Frame CornerRadius="24" HasShadow="False" BackgroundColor="#6A84FF" Padding="12" WidthRequest="320">
+                <Entry x:Name="PasswordEntry"
+                       Placeholder="Enter your password"
+                       PlaceholderColor="#DDE8FF"
+                       IsPassword="True"
+                       BackgroundColor="Transparent"
+                       TextColor="White" />
+            </Frame>
 
             <Label x:Name="ErrorLabel"
-                   TextColor="Red"
+                   TextColor="#FFD2D2"
                    FontSize="13"
-                   IsVisible="False" />
+                   IsVisible="False"
+                   HorizontalOptions="Start" />
 
-            <Button Text="Log In"
+            <Label Text="Forgot password?"
+                   TextColor="#E8F0FF"
+                   HorizontalOptions="End">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnForgotPasswordTapped" />
+                </Label.GestureRecognizers>
+            </Label>
+
+            <Button Text="Login"
                     Clicked="OnLoginClicked"
-                    Margin="0,10,0,0" />
+                    CornerRadius="24"
+                    BackgroundColor="White"
+                    TextColor="#4A67F2"
+                    WidthRequest="320"
+                    HeightRequest="48"
+                    FontAttributes="Bold"
+                    Margin="0,6,0,0" />
 
             <ActivityIndicator x:Name="BusyIndicator"
                                IsVisible="False"
-                               IsRunning="False" />
+                               IsRunning="False"
+                               Color="White" />
 
-            <HorizontalStackLayout HorizontalOptions="Center" Spacing="4" Margin="0,20,0,0">
-                <Label Text="Don't have an account?" />
+            <HorizontalStackLayout HorizontalOptions="Center" Spacing="6" Margin="0,18,0,0">
+                <Label Text="Don't have an account?" TextColor="#E8F0FF" />
                 <Label Text="Register"
-                       TextColor="Blue"
+                       TextColor="White"
                        FontAttributes="Bold">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnRegisterTapped" />

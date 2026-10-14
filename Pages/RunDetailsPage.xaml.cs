@@ -16,6 +16,7 @@ public partial class RunDetailsPage : ContentPage
 {
     private RunSession? _run;
     private readonly RunTrackerService _runService;
+    private string? _runIdValue;
 
     public RunDetailsPage()
     {
@@ -28,23 +29,80 @@ public partial class RunDetailsPage : ContentPage
     {
         set
         {
+            _runIdValue = value;
             if (!string.IsNullOrEmpty(value))
                 _ = LoadRunAsync(value);
         }
     }
 
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+
+        // If we have a run id stored, reload the run to reflect any edits
+        if (!string.IsNullOrEmpty(_runIdValue))
+        {
+            await LoadRunAsync(_runIdValue);
+        }
+    }
+
     public DateTime StartTime => _run?.StartTime ?? DateTime.Now;
-    public string DistanceFormatted => _run?.DistanceFormatted.ToString() ?? "0";
+    // Editable bindings
+    public DateTime StartDate { get; set; } = DateTime.Now.Date;
+    public TimeSpan StartTimeOfDay { get; set; } = DateTime.Now.TimeOfDay;
+    // Display distance with two decimal places for the large header (0.00 format)
+    public string DistanceFormatted => _run != null ? _run.DistanceFormatted.ToString("0.00") : "0.00";
     public string DurationFormatted => _run?.DurationFormatted ?? "00:00:00";
     public string AveragePaceFormatted => _run?.AveragePaceFormatted ?? "0 km/h";
+    public string CaloriesDisplay => _run != null ? $"{_run.Calories} kcal" : "0 kcal";
+    public string StepsDisplay => _run != null ? _run.Steps.ToString() : "0";
 
     private async Task LoadRunAsync(string id)
     {
         _run = await _runService.GetRunByIdAsync(id);
+        if (_run != null)
+        {
+            var local = ToLocal(_run.StartTime);
+            StartDate = local.Date;
+            StartTimeOfDay = local.TimeOfDay;
+            OnPropertyChanged(nameof(StartDate));
+            OnPropertyChanged(nameof(StartTimeOfDay));
+        }
         OnPropertyChanged(nameof(StartTime));
         OnPropertyChanged(nameof(DistanceFormatted));
         OnPropertyChanged(nameof(DurationFormatted));
         OnPropertyChanged(nameof(AveragePaceFormatted));
+        OnPropertyChanged(nameof(CaloriesDisplay));
+        OnPropertyChanged(nameof(StepsDisplay));
+    }
+
+    private DateTime ToLocal(DateTime dt)
+    {
+        if (dt.Kind == DateTimeKind.Local) return dt;
+        if (dt.Kind == DateTimeKind.Utc) return dt.ToLocalTime();
+        return DateTime.SpecifyKind(dt, DateTimeKind.Utc).ToLocalTime();
+    }
+
+    private async void OnSaveClicked(object sender, EventArgs e)
+    {
+        if (_run == null) return;
+
+        // Combine local date/time and convert to UTC for storage
+        var combinedLocal = DateTime.SpecifyKind(StartDate.Date + StartTimeOfDay, DateTimeKind.Local);
+        _run.StartTime = combinedLocal.ToUniversalTime();
+        if (_run.Duration > TimeSpan.Zero)
+            _run.EndTime = _run.StartTime + _run.Duration;
+
+        try
+        {
+            await _runService.UpdateRunAsync(_run);
+            // Navigate back to history
+            await Shell.Current.GoToAsync("..");
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlert("Error", "Failed to save run: " + ex.Message, "OK");
+        }
     }
 
     private async void OnExportPdfClicked(object sender, EventArgs e)
@@ -124,7 +182,7 @@ public partial class RunDetailsPage : ContentPage
 
         canvas.DrawText("Run Report", 30, 50, titleFont, blackPaint);
         canvas.DrawText($"Date: {run.StartTime:MMM dd, yyyy - HH:mm}", 30, 100, bodyFont, blackPaint);
-        canvas.DrawText($"Distance: {run.DistanceFormatted} km", 30, 130, bodyFont, blackPaint);
+        canvas.DrawText($"Distance: {run.DistanceFormatted.ToString("0.00")} km", 30, 130, bodyFont, blackPaint);
         canvas.DrawText($"Duration: {run.DurationFormatted}", 30, 160, bodyFont, blackPaint);
         canvas.DrawText($"Average Pace: {run.AveragePaceFormatted}", 30, 190, bodyFont, blackPaint);
         canvas.DrawText("(Exported from RunWise)", 30, 240, footerFont, grayPaint);
@@ -148,5 +206,17 @@ public partial class RunDetailsPage : ContentPage
     private async void OnCloseClicked(object sender, EventArgs e)
     {
         await Shell.Current.GoToAsync("..");
+    }
+
+    private async void OnRecommendFoodClicked(object sender, EventArgs e)
+    {
+        if (_run == null)
+        {
+            await DisplayAlert("No run", "No run data available to recommend food for.", "OK");
+            return;
+        }
+
+        // Navigate to the run-specific food recommendation page
+        await Shell.Current.GoToAsync($"runfood?runId={Uri.EscapeDataString(_run.Id)}");
     }
 }

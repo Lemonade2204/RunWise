@@ -1,0 +1,165 @@
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:RunWise.ViewModels"
+             x:Class="RunWise.Pages.MealPlannerPage"
+             Title="Meal Planner">
+
+    <ContentPage.BindingContext>
+        <vm:MealPlannerViewModel />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="14" BackgroundColor="#F8F6F4">
+
+            <!-- Centered date header (tap to change date) -->
+            <Grid Padding="0,8" ColumnDefinitions="Auto,*,Auto" HorizontalOptions="Fill">
+                <Button Text="◀" Command="{Binding PrevDateCommand}" BackgroundColor="Transparent" TextColor="Black" HorizontalOptions="Start" />
+                <StackLayout x:Name="DateTapArea" Grid.Column="1" HorizontalOptions="Center" Padding="0,8">
+                    <Label Text="{Binding SelectedDate, StringFormat='{0:dddd}'}" FontAttributes="Bold" FontSize="20" TextColor="#333" HorizontalOptions="Center" />
+                    <Label Text="{Binding SelectedDate, StringFormat='{0:MMMM d, yyyy}'}" FontSize="12" TextColor="#666" HorizontalOptions="Center" />
+                    <!-- Hidden DatePicker opens platform date picker when tapped -->
+                    <DatePicker x:Name="DatePicker" IsVisible="False" Date="{Binding SelectedDate, Mode=TwoWay}" />
+                </StackLayout>
+                <Button Text="▶" Grid.Column="2" Command="{Binding NextDateCommand}" BackgroundColor="Transparent" TextColor="Black" HorizontalOptions="End" />
+            </Grid>
+
+            <!-- Calorie summary styled to match the mockup -->
+            <Frame CornerRadius="18" Padding="18" BackgroundColor="#F3EAF6" HasShadow="False" Margin="0,6">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Daily calories" FontSize="14" TextColor="#6B5D73" />
+                    <HorizontalStackLayout Spacing="6" VerticalOptions="Center" HorizontalOptions="Start">
+                        <Label Text="{Binding TodayTotalCalories}" FontSize="40" FontAttributes="Bold" TextColor="#2A2430" />
+                        <Label Text="kcal" FontSize="16" VerticalTextAlignment="Center" TextColor="#6B5D73" />
+                    </HorizontalStackLayout>
+                    <Label Text="Your day is ready to plan." FontSize="12" TextColor="#8A7C8E" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Your meals header -->
+            <Grid ColumnDefinitions="*,Auto" Padding="0,4">
+                <Label Text="Your meals" FontAttributes="Bold" FontSize="16" />
+                <Label Text="{Binding ItemsPlannedCount, StringFormat='{}{0} items planned'}" VerticalOptions="Center" HorizontalOptions="End" TextColor="#666" />
+            </Grid>
+
+            <!-- Meal cards container -->
+            <VerticalStackLayout Spacing="12">
+
+                <!-- Breakfast -->
+                <Frame CornerRadius="12" Padding="12" HasShadow="False" BackgroundColor="#FFFFFF" BorderColor="#EFEFF0">
+                    <VerticalStackLayout Spacing="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackLayout Orientation="Vertical">
+                                <Label Text="Breakfast" FontAttributes="Bold" />
+                                <Label Text="No items added yet" IsVisible="{Binding BreakfastEmpty}" FontSize="12" TextColor="#666" />
+                            </StackLayout>
+                            <Label Text="{Binding BreakfastCalories, StringFormat='{}{0} kcal'}" Grid.Column="1" VerticalOptions="Center" TextColor="#666" />
+                        </Grid>
+
+                        <CollectionView ItemsSource="{Binding Breakfast}" HeightRequest="120">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <SwipeView>
+                                        <SwipeView.RightItems>
+                                            <SwipeItems Mode="Execute">
+                                                <SwipeItem Text="Delete" BackgroundColor="#FF6666" Invoked="OnDeleteMealInvoked"/>
+                                                <SwipeItem Text="Edit" BackgroundColor="#6A84FF" Invoked="OnEditMealInvoked"/>
+                                            </SwipeItems>
+                                        </SwipeView.RightItems>
+                                        <Grid Padding="8">
+                                            <Label Text="{Binding .}" />
+                                        </Grid>
+                                    </SwipeView>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                        <Label Text="No items added yet" IsVisible="{Binding BreakfastEmpty}" FontSize="12" TextColor="#666" />
+                        <Button x:Name="BreakfastAddButton" Text="Add breakfast item" BackgroundColor="#F3EAF8" TextColor="#6A2EAB" CornerRadius="12" HeightRequest="44" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Lunch -->
+                <Frame CornerRadius="12" Padding="12" HasShadow="False" BackgroundColor="#FFFFFF" BorderColor="#EFEFF0">
+                    <VerticalStackLayout Spacing="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackLayout Orientation="Vertical">
+                                <Label Text="Lunch" FontAttributes="Bold" />
+                                <Label Text="No items added yet" IsVisible="{Binding LunchEmpty}" FontSize="12" TextColor="#666" />
+                            </StackLayout>
+                            <Label Text="{Binding LunchCalories, StringFormat='{}{0} kcal'}" Grid.Column="1" VerticalOptions="Center" TextColor="#666" />
+                        </Grid>
+
+                        <CollectionView ItemsSource="{Binding Lunch}" HeightRequest="120">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <SwipeView>
+                                        <SwipeView.RightItems>
+                                            <SwipeItems Mode="Execute">
+                                                <SwipeItem Text="Delete" BackgroundColor="#FF6666" Invoked="OnDeleteMealInvoked"/>
+                                                <SwipeItem Text="Edit" BackgroundColor="#6A84FF" Invoked="OnEditMealInvoked"/>
+                                            </SwipeItems>
+                                        </SwipeView.RightItems>
+                                        <Grid Padding="8">
+                                            <Label Text="{Binding .}" />
+                                        </Grid>
+                                    </SwipeView>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                        <Label Text="No items added yet" IsVisible="{Binding LunchEmpty}" FontSize="12" TextColor="#666" />
+                        <Button x:Name="LunchAddButton" Text="Add lunch item" BackgroundColor="#F3EAF8" TextColor="#6A2EAB" CornerRadius="12" HeightRequest="44" />
+                    </VerticalStackLayout>
+                </Frame>
+
+                <!-- Dinner -->
+                <Frame CornerRadius="12" Padding="12" HasShadow="False" BackgroundColor="#FFFFFF" BorderColor="#EFEFF0">
+                    <VerticalStackLayout Spacing="10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackLayout Orientation="Vertical">
+                                <Label Text="Dinner" FontAttributes="Bold" />
+                                <Label Text="No items added yet" IsVisible="{Binding DinnerEmpty}" FontSize="12" TextColor="#666" />
+                            </StackLayout>
+                            <Label Text="{Binding DinnerCalories, StringFormat='{}{0} kcal'}" Grid.Column="1" VerticalOptions="Center" TextColor="#666" />
+                        </Grid>
+
+                        <CollectionView ItemsSource="{Binding Dinner}" HeightRequest="120">
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <SwipeView>
+                                        <SwipeView.RightItems>
+                                            <SwipeItems Mode="Execute">
+                                                <SwipeItem Text="Delete" BackgroundColor="#FF6666" Invoked="OnDeleteMealInvoked"/>
+                                                <SwipeItem Text="Edit" BackgroundColor="#6A84FF" Invoked="OnEditMealInvoked"/>
+                                            </SwipeItems>
+                                        </SwipeView.RightItems>
+                                        <Grid Padding="8">
+                                            <Label Text="{Binding .}" />
+                                        </Grid>
+                                    </SwipeView>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                        <Label Text="No items added yet" IsVisible="{Binding DinnerEmpty}" FontSize="12" TextColor="#666" />
+                        <Button x:Name="DinnerAddButton" Text="Add dinner item" BackgroundColor="#F3EAF8" TextColor="#6A2EAB" CornerRadius="12" HeightRequest="44" />
+                    </VerticalStackLayout>
+                </Frame>
+
+            </VerticalStackLayout>
+
+            <Label Text="Start with one meal. Add an item above to begin building your day." FontSize="12" TextColor="#666" Padding="4,8" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

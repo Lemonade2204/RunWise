@@ -11,6 +11,9 @@
     "Profile 2": {
       "commandName": "Project",
       "nativeDebugging": false
+    },
+    "Profile 3": {
+      "commandName": "Project"
     }
   }
 }

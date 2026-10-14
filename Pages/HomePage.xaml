@@ -16,6 +16,28 @@
                 <Label Text="No runs yet. Start tracking your first run!" FontSize="16" TextColor="#666" HorizontalTextAlignment="Center"/>
             </Frame>
 
+            <!-- Today's summary -->
+            <Frame Padding="16" CornerRadius="10" BorderColor="#e0e0e0" HasShadow="True"
+                   IsVisible="{Binding HasRecentRun}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Today" FontSize="18" FontAttributes="Bold" TextColor="#333"/>
+                    <HorizontalStackLayout Spacing="16">
+                        <VerticalStackLayout>
+                            <Label Text="Distance" FontSize="12" TextColor="#666"/>
+                            <Label Text="{Binding TodayDistance}" FontSize="16" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout>
+                            <Label Text="Steps" FontSize="12" TextColor="#666"/>
+                            <Label Text="{Binding TodaySteps}" FontSize="16" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout>
+                            <Label Text="Calories" FontSize="12" TextColor="#666"/>
+                            <Label Text="{Binding TodayCalories}" FontSize="16" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
             <!-- Recent run state -->
             <Frame Padding="16" CornerRadius="10" BorderColor="#e0e0e0" HasShadow="True"
                    IsVisible="{Binding HasRecentRun}">
@@ -37,8 +59,50 @@
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
             </Frame>
-            
-            
+
+            <!-- Weekly mileage bar chart -->
+            <Frame Padding="16" CornerRadius="10" BorderColor="#e0e0e0" HasShadow="True"
+                   IsVisible="{Binding HasRecentRun}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Weekly Mileage" FontSize="18" FontAttributes="Bold" TextColor="#333"/>
+                    <CollectionView ItemsSource="{Binding WeeklyBars}" ItemsLayout="HorizontalList" HeightRequest="180" HorizontalOptions="Fill">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <VerticalStackLayout WidthRequest="48" HorizontalOptions="Center" Spacing="6">
+                                    <Label Text="{Binding DistanceLabel}" FontSize="12" HorizontalTextAlignment="Center"/>
+                                    <Grid HeightRequest="120">
+                                        <BoxView HeightRequest="{Binding BarHeight}" WidthRequest="28" BackgroundColor="#4CAF50" VerticalOptions="End" HorizontalOptions="Center" CornerRadius="6"/>
+                                    </Grid>
+                                    <Label Text="{Binding DayLabel}" FontSize="12" HorizontalTextAlignment="Center"/>
+                                </VerticalStackLayout>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Personal Records -->
+            <Frame Padding="16" CornerRadius="10" BorderColor="#e0e0e0" HasShadow="True"
+                   IsVisible="{Binding HasRecentRun}">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Personal Records" FontSize="18" FontAttributes="Bold" TextColor="#333"/>
+                    <HorizontalStackLayout Spacing="16">
+                        <VerticalStackLayout>
+                            <Label Text="Longest Distance" FontSize="12" TextColor="#666"/>
+                            <Label Text="{Binding LongestDistance}" FontSize="16" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout>
+                            <Label Text="Longest Duration" FontSize="12" TextColor="#666"/>
+                            <Label Text="{Binding LongestDuration}" FontSize="16" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                        <VerticalStackLayout>
+                            <Label Text="Best Pace" FontSize="12" TextColor="#666"/>
+                            <Label Text="{Binding BestPace}" FontSize="16" FontAttributes="Bold"/>
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>

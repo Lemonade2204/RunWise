@@ -76,16 +76,22 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Pages\LoginPage.xaml.cs">
+		<Compile Update="Pages\LoginPage.xaml.cs">
 	    <DependentUpon>LoginPage.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Pages\RegisterPage.xaml.cs">
 		<DependentUpon>RegisterPage.xaml</DependentUpon>
 	  </Compile>
+		<Compile Update="Pages\ExercisesPage.xaml.cs">
+			<DependentUpon>ExercisesPage.xaml</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
 	  <MauiXaml Update="Pages\EditRunPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Pages\ExercisesPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Pages\FoodRecommendationPage.xaml">
@@ -103,6 +109,9 @@
 	  <MauiXaml Update="Pages\LoginPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Pages\MealPlannerPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Pages\ProfilePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -118,6 +127,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="Controls\" />
 	  <Folder Include="TestHarness\" />
 	</ItemGroup>
 

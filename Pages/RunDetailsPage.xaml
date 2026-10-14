@@ -5,23 +5,64 @@
              Title="Run Details">
 
     <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="12">
-            <Label Text="Run Details" FontAttributes="Bold" FontSize="18" HorizontalOptions="Center" />
+        <VerticalStackLayout Spacing="16">
+            <!-- Top distance banner -->
+            <Grid BackgroundColor="{StaticResource Primary}" Padding="28" HorizontalOptions="Fill">
+                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="6">
+                    <Label Text="DISTANCE" TextColor="White" FontSize="12" HorizontalOptions="Center"/>
+                    <Label Text="{Binding DistanceFormatted}" TextColor="White" FontAttributes="Bold" FontSize="72" HorizontalOptions="Center" />
+                    <Label Text="kilometers" TextColor="White" FontSize="14" HorizontalOptions="Center"/>
+                </VerticalStackLayout>
+            </Grid>
 
-            <Label Text="Date and Time" FontAttributes="Bold" />
-            <Label Text="{Binding StartTime, StringFormat='{0:MMM dd, yyyy - HH:mm}'}" />
+            <!-- Metrics grid -->
+            <Grid Padding="20" RowSpacing="12" ColumnSpacing="12">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
 
-            <Label Text="Distance" FontAttributes="Bold" />
-            <Label Text="{Binding DistanceFormatted}" />
+                <!-- Duration -->
+                <Frame Grid.Row="0" Grid.Column="0" CornerRadius="12" HasShadow="False" BackgroundColor="{StaticResource White}" Padding="12">
+                    <VerticalStackLayout>
+                        <Label Text="DURATION" FontSize="12" TextColor="{StaticResource SecondaryDarkText}" />
+                        <Label Text="{Binding DurationFormatted}" FontAttributes="Bold" FontSize="20" TextColor="{StaticResource Gray950}" />
+                    </VerticalStackLayout>
+                </Frame>
 
-            <Label Text="Duration" FontAttributes="Bold" />
-            <Label Text="{Binding DurationFormatted}" />
+                <!-- Avg Pace -->
+                <Frame Grid.Row="0" Grid.Column="1" CornerRadius="12" HasShadow="False" BackgroundColor="{StaticResource White}" Padding="12">
+                    <VerticalStackLayout>
+                        <Label Text="AVG PACE" FontSize="12" TextColor="#6C33FF" />
+                        <Label Text="{Binding AveragePaceFormatted}" FontAttributes="Bold" FontSize="20" TextColor="{StaticResource Gray950}" />
+                    </VerticalStackLayout>
+                </Frame>
 
-            <Label Text="Average Pace" FontAttributes="Bold" />
-            <Label Text="{Binding AveragePaceFormatted}" />
+                <!-- Calories -->
+                <Frame Grid.Row="1" Grid.Column="0" CornerRadius="12" HasShadow="False" BackgroundColor="{StaticResource White}" Padding="12">
+                    <VerticalStackLayout>
+                        <Label Text="CALORIES" FontSize="12" TextColor="#FF6A00" />
+                        <Label Text="{Binding CaloriesDisplay}" FontAttributes="Bold" FontSize="20" TextColor="{StaticResource Gray950}" />
+                    </VerticalStackLayout>
+                </Frame>
 
-            <HorizontalStackLayout Spacing="12">
+                <!-- Steps -->
+                <Frame Grid.Row="1" Grid.Column="1" CornerRadius="12" HasShadow="False" BackgroundColor="{StaticResource White}" Padding="12">
+                    <VerticalStackLayout>
+                        <Label Text="STEPS" FontSize="12" TextColor="#1DB954" />
+                        <Label Text="{Binding StepsDisplay}" FontAttributes="Bold" FontSize="20" TextColor="{StaticResource Gray950}" />
+                    </VerticalStackLayout>
+                </Frame>
+            </Grid>
+
+            <!-- Actions -->
+            <HorizontalStackLayout Padding="20" Spacing="12" HorizontalOptions="Center">
                 <Button Text="Export PDF" Clicked="OnExportPdfClicked" />
+                <Button Text="Recommend Food" Clicked="OnRecommendFoodClicked" />
                 <Button Text="Close" Clicked="OnCloseClicked" />
             </HorizontalStackLayout>
         </VerticalStackLayout>

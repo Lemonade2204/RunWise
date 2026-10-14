@@ -23,6 +23,10 @@ public class RunSession
     public DateTime? EndTime { get; set; }
     public TimeSpan Duration { get; set; }
     public double DistanceMeters { get; set; }
+    // estimated steps for this run (approx steps per km)
+    public int Steps { get; set; } = 0;
+    // calories burned for this run (integer, stored as kcal)
+    public int Calories { get; set; } = 0;
     
 
     public string DurationFormatted

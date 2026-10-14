@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using RunWise.Models;
 using RunWise.Services;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Linq;
 
 namespace RunWise.ViewModels;
 
@@ -15,10 +17,40 @@ public partial class HistoryViewModel : ObservableObject
         _runTrackerService =
             IPlatformApplication.Current?.Services.GetService<RunTrackerService>()
             ?? new RunTrackerService();
+        // update summary whenever collection changes
+        RunHistory.CollectionChanged += (s, e) => UpdateSummary();
     }
 
     [ObservableProperty]
     ObservableCollection<RunSession> runHistory = new();
+
+    private int _totalRuns = 0;
+    public int TotalRuns
+    {
+        get => _totalRuns;
+        set => SetProperty(ref _totalRuns, value);
+    }
+
+    private double _totalDistanceKm = 0.0;
+    public double TotalDistanceKm
+    {
+        get => _totalDistanceKm;
+        set => SetProperty(ref _totalDistanceKm, value);
+    }
+
+    private int _totalCalories = 0;
+    public int TotalCalories
+    {
+        get => _totalCalories;
+        set => SetProperty(ref _totalCalories, value);
+    }
+
+    private string _overallAveragePaceFormatted = "-";
+    public string OverallAveragePaceFormatted
+    {
+        get => _overallAveragePaceFormatted;
+        set => SetProperty(ref _overallAveragePaceFormatted, value);
+    }
 
     [ObservableProperty]
     bool isLoading = false;
@@ -33,6 +65,7 @@ public partial class HistoryViewModel : ObservableObject
             RunHistory.Clear();
             foreach (var record in records)
                 RunHistory.Add(record);
+            UpdateSummary();
         }
         catch (Exception ex)
         {
@@ -58,5 +91,25 @@ public partial class HistoryViewModel : ObservableObject
 
         await _runTrackerService.DeleteRunAsync(run.Id);
         RunHistory.Remove(run);
+        UpdateSummary();
+    }
+
+    private void UpdateSummary()
+    {
+        TotalRuns = RunHistory.Count;
+        TotalDistanceKm = Math.Round(RunHistory.Sum(r => r.DistanceKm), 2);
+        TotalCalories = RunHistory.Sum(r => r.Calories);
+
+        // Overall average pace (km/h): total distance / total hours across all runs
+        var totalHours = RunHistory.Sum(r => r.Duration.TotalHours);
+        if (totalHours > 0 && TotalDistanceKm > 0)
+        {
+            var avgKmh = TotalDistanceKm / totalHours;
+            OverallAveragePaceFormatted = Math.Round(avgKmh, 2) + " km/h";
+        }
+        else
+        {
+            OverallAveragePaceFormatted = "-";
+        }
     }
 }

@@ -4,6 +4,11 @@
         <name>RunWise</name>
     </assembly>
     <members>
+        <member name="M:RunWise.Services.MuscleWikiService.GetDashboardRoutineAsync(System.String,System.String)">
+            <summary>
+            Call the MuscleWiki dashboard endpoint to fetch a curated routine (includes video information when available).
+            </summary>
+        </member>
         <member name="M:RunWise.Services.RunTrackerService.RemoveLocalRunsNotOwnedAsync(System.String)">
             <summary>
             Remove local runs that are owned by a different user than the supplied userId.
@@ -104,6 +109,24 @@
         </member>
         <member name="P:HomeViewModel.RecentAvgPace">
             <inheritdoc cref="F:HomeViewModel.recentAvgPace"/>
+        </member>
+        <member name="P:HomeViewModel.TodayDistance">
+            <inheritdoc cref="F:HomeViewModel.todayDistance"/>
+        </member>
+        <member name="P:HomeViewModel.TodaySteps">
+            <inheritdoc cref="F:HomeViewModel.todaySteps"/>
+        </member>
+        <member name="P:HomeViewModel.TodayCalories">
+            <inheritdoc cref="F:HomeViewModel.todayCalories"/>
+        </member>
+        <member name="P:HomeViewModel.LongestDistance">
+            <inheritdoc cref="F:HomeViewModel.longestDistance"/>
+        </member>
+        <member name="P:HomeViewModel.LongestDuration">
+            <inheritdoc cref="F:HomeViewModel.longestDuration"/>
+        </member>
+        <member name="P:HomeViewModel.BestPace">
+            <inheritdoc cref="F:HomeViewModel.bestPace"/>
         </member>
         <member name="P:HomeViewModel.HasRecentRun">
             <inheritdoc cref="F:HomeViewModel.hasRecentRun"/>
@@ -255,6 +278,24 @@
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.RecentAvgPace">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "RecentAvgPace" generated properties.</summary>
         </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TodayDistance">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TodayDistance" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TodaySteps">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TodaySteps" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.TodayCalories">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "TodayCalories" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.LongestDistance">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "LongestDistance" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.LongestDuration">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "LongestDuration" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.BestPace">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "BestPace" generated properties.</summary>
+        </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangingArgs.HasRecentRun">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangingEventArgs"/> instance for all "HasRecentRun" generated properties.</summary>
         </member>
@@ -305,6 +346,24 @@
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.RecentAvgPace">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "RecentAvgPace" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TodayDistance">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TodayDistance" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TodaySteps">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TodaySteps" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.TodayCalories">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "TodayCalories" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.LongestDistance">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "LongestDistance" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.LongestDuration">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "LongestDuration" generated properties.</summary>
+        </member>
+        <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.BestPace">
+            <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "BestPace" generated properties.</summary>
         </member>
         <member name="F:CommunityToolkit.Mvvm.ComponentModel.__Internals.__KnownINotifyPropertyChangedArgs.HasRecentRun">
             <summary>The cached <see cref="T:System.ComponentModel.PropertyChangedEventArgs"/> instance for all "HasRecentRun" generated properties.</summary>

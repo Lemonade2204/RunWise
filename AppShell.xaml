@@ -10,34 +10,54 @@
 
     <FlyoutItem FlyoutDisplayOptions="AsMultipleItems">
         <ShellContent
-        Title="Home"
-        ContentTemplate="{DataTemplate local:Pages.HomePage}"
-        Route="home" />
+            Title="Home"
+            Shell.NavBarIsVisible="False"
+            ContentTemplate="{DataTemplate local:Pages.HomePage}"
+            Route="home" />
 
         <ShellContent
-        Title="Maps"
-        ContentTemplate="{DataTemplate local:Pages.MapPage}"
-        Route="maps" />
+            Title="Maps"
+            Shell.NavBarIsVisible="False"
+            ContentTemplate="{DataTemplate local:Pages.MapPage}"
+            Route="maps" />
 
         <ShellContent
-        Title="Run"
-        ContentTemplate="{DataTemplate local:Pages.RunPage}"
-        Route="run" />
+            Title="Run"
+            Shell.NavBarIsVisible="False"
+            ContentTemplate="{DataTemplate local:Pages.RunPage}"
+            Route="run" />
 
         <ShellContent
-        Title="History"
-        ContentTemplate="{DataTemplate local:Pages.HistoryPage}"
-        Route="history" />
+            Title="History"
+            Shell.NavBarIsVisible="False"
+            ContentTemplate="{DataTemplate local:Pages.HistoryPage}"
+            Route="history" />
 
         <ShellContent
-        Title="Profile"
-        ContentTemplate="{DataTemplate local:Pages.ProfilePage}"
-        Route="profile" />
+            Title="Profile"
+            Shell.NavBarIsVisible="False"
+            ContentTemplate="{DataTemplate local:Pages.ProfilePage}"
+            Route="profile" />
 
         <ShellContent
-        Title="Food"
-        ContentTemplate="{DataTemplate local:Pages.FoodRecommendationPage}"
-        Route="food" />
+            Title="Exercises"
+            Shell.NavBarIsVisible="False"
+            ContentTemplate="{DataTemplate local:Pages.ExercisesPage}"
+            Route="exercises" />
+
+        <ShellContent
+            Title="Food"
+            Shell.NavBarIsVisible="False"
+            ContentTemplate="{DataTemplate local:Pages.FoodRecommendationPage}"
+            Route="food" />
+
+        <!-- Single Food page - users reach this for search and add -->
+
+        <ShellContent
+            Title="Meal Planner"
+            Shell.NavBarIsVisible="False"
+            ContentTemplate="{DataTemplate local:Pages.MealPlannerPage}"
+            Route="mealplanner" />
 
 
     </FlyoutItem>

@@ -44,4 +44,19 @@ public partial class HistoryPage : ContentPage
             await Shell.Current.GoToAsync($"rundetails?runId={Uri.EscapeDataString(run.Id)}");
         }
     }
+
+    private async void OnShareClicked(object sender, EventArgs e)
+    {
+        if (sender is Button btn && btn.CommandParameter is RunSession run)
+        {
+            // Simple placeholder share action: show an alert. Replace with platform share when desired.
+            await DisplayAlert("Share", $"Share run {run.Id}", "OK");
+        }
+    }
+
+    private async void OnRecommendFoodClicked(object sender, EventArgs e)
+    {
+        // This method was used by the History view's Food button which was removed.
+        // Food recommendation is now accessed from the RunDetails view.
+    }
 }

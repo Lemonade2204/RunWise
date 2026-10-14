@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
 using System.IO;
+using System.Collections.Generic;
+using System.Globalization;
 using Microsoft.Maui.Controls;
 using RunWise.Services;
 using RunWise.Models;
@@ -12,10 +14,54 @@ public partial class ProfilePage : ContentPage
 	private readonly SupabaseAuthService? _auth;
 	private Profile? _loadedProfile;
 
+	private List<RunSession> _allRuns = new List<RunSession>();
+
 	public ProfilePage()
 	{
 		InitializeComponent();
 		_auth = MauiProgram.Services.GetService(typeof(SupabaseAuthService)) as SupabaseAuthService;
+	}
+
+	private string MapDisplayGenderToStored(string display)
+	{
+		if (string.IsNullOrWhiteSpace(display)) return string.Empty;
+		switch (display.Trim())
+		{
+			case "Male": return "male";
+			case "Female": return "female";
+			case "Other": return "other";
+			case "Prefer not to say": return "prefer_not_to_say";
+			default: return display.Trim().ToLowerInvariant();
+		}
+	}
+
+	private string MapStoredGenderToDisplay(string stored)
+	{
+		if (string.IsNullOrWhiteSpace(stored)) return string.Empty;
+		switch (stored.Trim().ToLowerInvariant())
+		{
+			case "male": return "Male";
+			case "female": return "Female";
+			case "other": return "Other";
+			case "prefer_not_to_say": return "Prefer not to say";
+			default: return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(stored.Trim());
+		}
+	}
+
+	private DateTime ToLocal(DateTime dt)
+	{
+		if (dt.Kind == DateTimeKind.Local)
+			return dt;
+		if (dt.Kind == DateTimeKind.Utc)
+			return dt.ToLocalTime();
+		return DateTime.SpecifyKind(dt, DateTimeKind.Utc).ToLocalTime();
+	}
+
+	private static DateTime StartOfWeek(DateTime now)
+	{
+		var start = now.Date;
+		while (start.DayOfWeek != DayOfWeek.Monday) start = start.AddDays(-1);
+		return start;
 	}
 
 	protected override async void OnAppearing()
@@ -30,66 +76,9 @@ public partial class ProfilePage : ContentPage
 			var (ok, err, profile) = await _auth.GetProfileAsync();
 			if (ok && profile != null)
 			{
-				EmailLabel.Text = profile.Email ?? "";
-				NameEntry.Text = profile.Username ?? "";
-				WeightEntry.Text = profile.WeightKg?.ToString() ?? "";
-				HeightEntry.Text = profile.HeightCm?.ToString() ?? "";
-
-				// remember loaded profile for cancel
 				_loadedProfile = profile;
-
-				// ensure editing UI state: disabled until Edit pressed
-				NameEntry.IsEnabled = false;
-				WeightEntry.IsEnabled = false;
-				HeightEntry.IsEnabled = false;
-				SaveButton.IsVisible = false;
-				CancelButton.IsVisible = false;
-				EditButton.IsVisible = true;
-
-				// Compute weekly and all-time aggregates from runs (like History)
-				try
-				{
-					var runService = new RunTrackerService();
-					var allRuns = await runService.GetAllRunsAsync();
-
-					// Only runs for current user should be returned by service, but ensure UTC comparison
-					var weekAgo = DateTime.UtcNow.AddDays(-7);
-					var runsThisWeek = allRuns.Where(r => r.StartTime.ToUniversalTime() >= weekAgo).ToList();
-
-					if (runsThisWeek.Count > 0)
-					{
-						var avgDist = runsThisWeek.Average(r => r.DistanceMeters) / 1000.0; // meters -> km
-						var avgTimeSec = runsThisWeek.Average(r => r.Duration.TotalSeconds);
-						WeeklyDistanceLabel.Text = $"Distance: {avgDist:0.00} km";
-						WeeklyTimeLabel.Text = $"Time: {SecondsToHMS((int)Math.Round(avgTimeSec))}";
-					}
-					else
-					{
-						WeeklyDistanceLabel.Text = "Distance: -";
-						WeeklyTimeLabel.Text = "Time: -";
-					}
-
-					if (allRuns.Count > 0)
-					{
-						var totalDist = allRuns.Sum(r => r.DistanceMeters) / 1000.0;
-						var totalTime = (int)allRuns.Sum(r => r.Duration.TotalSeconds);
-						AllTimeDistanceLabel.Text = $"Distance: {totalDist:0.00} km";
-						AllTimeTimeLabel.Text = $"Time: {SecondsToHMS(totalTime)}";
-					}
-					else
-					{
-						AllTimeDistanceLabel.Text = "Distance: -";
-						AllTimeTimeLabel.Text = "Time: -";
-					}
-				}
-				catch (Exception ex)
-				{
-					System.Diagnostics.Debug.WriteLine($"Failed to compute aggregates from runs: {ex}");
-					WeeklyDistanceLabel.Text = "Distance: -";
-					WeeklyTimeLabel.Text = "Time: -";
-					AllTimeDistanceLabel.Text = "Distance: -";
-					AllTimeTimeLabel.Text = "Time: -";
-				}
+				ShowProfile(profile);
+				SetEditing(false);
 			}
 			else if (!ok)
 			{
@@ -100,6 +89,150 @@ public partial class ProfilePage : ContentPage
 		{
 			System.Diagnostics.Debug.WriteLine($"Profile load failed: {ex}");
 		}
+
+		try
+		{
+			var runService = new RunTrackerService();
+			_allRuns = await runService.GetAllRunsAsync();
+		}
+		catch (Exception ex)
+		{
+			System.Diagnostics.Debug.WriteLine($"Failed to load runs: {ex}");
+			_allRuns = new List<RunSession>();
+		}
+
+		UpdateSummary();
+
+		// hook up range picker
+		RangePicker.SelectedIndexChanged -= RangePicker_SelectedIndexChanged;
+		RangePicker.SelectedIndexChanged += RangePicker_SelectedIndexChanged;
+		if (RangePicker.SelectedIndex < 0) RangePicker.SelectedIndex = 0; // default All Time
+		else RangePicker_SelectedIndexChanged(RangePicker, EventArgs.Empty);
+	}
+
+	private void ShowProfile(Profile profile)
+	{
+		EmailLabel.Text = profile.Email ?? "";
+		HeaderEmailLabel.Text = profile.Email ?? "";
+		NameEntry.Text = profile.Username ?? "";
+		WeightEntry.Text = profile.WeightKg?.ToString() ?? "";
+		HeightEntry.Text = profile.HeightCm?.ToString() ?? "";
+		DobPicker.Date = profile.DateOfBirth?.Date ?? DateTime.Now.AddYears(-25);
+		GenderPicker.SelectedItem = string.IsNullOrEmpty(profile.Gender) ? null : MapStoredGenderToDisplay(profile.Gender);
+		UpdateHeader(profile);
+	}
+
+	// Header shows name plus a compact "age · weight · height" line when those are known
+	private void UpdateHeader(Profile profile)
+	{
+		HeaderNameLabel.Text = string.IsNullOrWhiteSpace(profile.Username) ? "Your name" : profile.Username;
+
+		var parts = new List<string>();
+		if (profile.DateOfBirth.HasValue)
+		{
+			var dob = profile.DateOfBirth.Value.Date;
+			var age = DateTime.Today.Year - dob.Year;
+			if (dob > DateTime.Today.AddYears(-age)) age--;
+			if (age > 0) parts.Add($"{age} yrs");
+		}
+		if (profile.WeightKg.HasValue) parts.Add($"{profile.WeightKg:0.#} kg");
+		if (profile.HeightCm.HasValue) parts.Add($"{profile.HeightCm:0.#} cm");
+
+		HeaderDetailsLabel.Text = string.Join("  ·  ", parts);
+		HeaderDetailsLabel.IsVisible = parts.Count > 0;
+	}
+
+	private void UpdateSummary()
+	{
+		var allRuns = _allRuns ?? new List<RunSession>();
+
+		var weekStart = StartOfWeek(DateTime.Now);
+		var runsThisWeek = allRuns.Where(r => ToLocal(r.StartTime).Date >= weekStart).ToList();
+		SetSummaryCard(runsThisWeek, WeeklyDistanceLabel, WeeklyTimeLabel);
+		SetSummaryCard(allRuns, AllTimeDistanceLabel, AllTimeTimeLabel);
+	}
+
+	private void SetSummaryCard(List<RunSession> runs, Label distanceLabel, Label detailLabel)
+	{
+		if (runs.Count == 0)
+		{
+			distanceLabel.Text = "0 km";
+			detailLabel.Text = "No runs yet";
+			return;
+		}
+
+		var km = runs.Sum(r => r.DistanceKm);
+		var seconds = (int)Math.Round(runs.Sum(r => r.Duration.TotalSeconds));
+		distanceLabel.Text = $"{km:0.00} km";
+		detailLabel.Text = $"{SecondsToHMS(seconds)} · {runs.Count} {(runs.Count == 1 ? "run" : "runs")}";
+	}
+
+	private void RangePicker_SelectedIndexChanged(object? sender, EventArgs e)
+	{
+		var idx = RangePicker.SelectedIndex;
+		string range = idx switch { 1 => "month", 2 => "week", _ => "all" };
+		UpdateStatistics(range);
+	}
+
+	private void UpdateStatistics(string range)
+	{
+		try
+		{
+			IEnumerable<RunSession> runs = _allRuns ?? new List<RunSession>();
+			var now = DateTime.Now;
+			switch (range)
+			{
+				case "month":
+					runs = runs.Where(r => ToLocal(r.StartTime).Year == now.Year && ToLocal(r.StartTime).Month == now.Month);
+					break;
+				case "week":
+					var startOfWeek = StartOfWeek(now);
+					runs = runs.Where(r => ToLocal(r.StartTime).Date >= startOfWeek);
+					break;
+			}
+
+			var runList = runs.ToList();
+			var count = runList.Count;
+			StatTotalRuns.Text = $"{count}";
+
+			if (count == 0)
+			{
+				foreach (var label in new[] { StatTotalHours, StatTotalKm, StatAvgPace, StatAvgKmPerRun, StatAvgHoursPerRun,
+					StatLongestRun, StatLongestDuration, StatBestPace, StatTotalCalories, StatTotalSteps, StatAvgStepsPerRun })
+				{
+					label.Text = "-";
+				}
+				return;
+			}
+
+			var totalKm = runList.Sum(r => r.DistanceKm);
+			var totalSeconds = runList.Sum(r => r.Duration.TotalSeconds);
+			var totalHours = totalSeconds / 3600.0;
+			StatTotalHours.Text = SecondsToHMS((int)Math.Round(totalSeconds));
+			StatTotalKm.Text = $"{totalKm:0.##} km";
+
+			// Average speed = total distance / total hours (km/h)
+			var avgSpeed = totalHours > 0 ? (totalKm / totalHours) : 0;
+			StatAvgPace.Text = $"{avgSpeed:0.##} km/h";
+
+			StatAvgKmPerRun.Text = $"{totalKm / count:0.##} km";
+			StatAvgHoursPerRun.Text = SecondsToHMS((int)Math.Round(totalSeconds / count));
+
+			StatLongestRun.Text = $"{runList.Max(r => r.DistanceKm):0.##} km";
+			StatLongestDuration.Text = runList.OrderByDescending(r => r.Duration.TotalSeconds).First().DurationFormatted;
+
+			var timedRuns = runList.Where(r => r.Duration.TotalHours > 0).ToList();
+			StatBestPace.Text = timedRuns.Count > 0 ? $"{timedRuns.Max(r => r.AveragePaceKmh):0.##} km/h" : "-";
+
+			var totalSteps = runList.Sum(r => r.Steps);
+			StatTotalCalories.Text = $"{runList.Sum(r => r.Calories):N0} kcal";
+			StatTotalSteps.Text = $"{totalSteps:N0}";
+			StatAvgStepsPerRun.Text = $"{(double)totalSteps / count:N0}";
+		}
+		catch (Exception ex)
+		{
+			System.Diagnostics.Debug.WriteLine($"Stats compute failed: {ex}");
+		}
 	}
 
 	private static string SecondsToHMS(int? seconds)
@@ -108,6 +241,25 @@ public partial class ProfilePage : ContentPage
 			return "-";
 		var ts = TimeSpan.FromSeconds(seconds.Value);
 		return string.Format("{0:D2}:{1:D2}:{2:D2}", (int)ts.TotalHours, ts.Minutes, ts.Seconds);
+	}
+
+	private void SetEditing(bool editing)
+	{
+		NameEntry.IsEnabled = editing;
+		WeightEntry.IsEnabled = editing;
+		HeightEntry.IsEnabled = editing;
+		DobPicker.IsEnabled = editing;
+		GenderPicker.IsEnabled = editing;
+		SaveButton.IsVisible = editing;
+		CancelButton.IsVisible = editing;
+		EditButton.IsVisible = !editing;
+
+		// outline the card while editing so it's clear the fields are live
+		PersonalInfoCard.Stroke = editing ? (Color)Resources["Primary"] : Colors.Transparent;
+
+		// live-update header as user types name
+		NameEntry.TextChanged -= NameEntry_TextChanged;
+		if (editing) NameEntry.TextChanged += NameEntry_TextChanged;
 	}
 
 	private async void OnSaveClicked(object? sender, EventArgs e)
@@ -133,6 +285,14 @@ public partial class ProfilePage : ContentPage
 			if (double.TryParse(HeightEntry.Text, out var h))
 				profile.HeightCm = h;
 
+			// date of birth and gender
+			profile.DateOfBirth = DobPicker.Date;
+			if (GenderPicker.SelectedItem is string gsel)
+			{
+				// normalize display value to stored representation expected by DB (lowercase, underscored)
+				profile.Gender = MapDisplayGenderToStored(gsel);
+			}
+
 			var (ok, err) = await _auth.UpdateProfileAsync(profile);
 			if (!ok)
 			{
@@ -141,15 +301,9 @@ public partial class ProfilePage : ContentPage
 			else
 			{
 				await DisplayAlert("Saved", "Profile saved successfully.", "OK");
-
-				// update loaded profile and disable editing
 				_loadedProfile = profile;
-				NameEntry.IsEnabled = false;
-				WeightEntry.IsEnabled = false;
-				HeightEntry.IsEnabled = false;
-				SaveButton.IsVisible = false;
-				CancelButton.IsVisible = false;
-				EditButton.IsVisible = true;
+				UpdateHeader(profile);
+				SetEditing(false);
 			}
 		}
 		catch (Exception ex)
@@ -160,33 +314,22 @@ public partial class ProfilePage : ContentPage
 
 	private void OnEditClicked(object? sender, EventArgs e)
 	{
-		// enable fields for editing
-		NameEntry.IsEnabled = true;
-		WeightEntry.IsEnabled = true;
-		HeightEntry.IsEnabled = true;
-		SaveButton.IsVisible = true;
-		CancelButton.IsVisible = true;
-		EditButton.IsVisible = false;
+		SetEditing(true);
+	}
+
+	private void NameEntry_TextChanged(object? sender, TextChangedEventArgs e)
+	{
+		HeaderNameLabel.Text = string.IsNullOrWhiteSpace(e.NewTextValue) ? "Your name" : e.NewTextValue;
 	}
 
 	private void OnCancelClicked(object? sender, EventArgs e)
 	{
-		// revert to loaded profile values and disable editing
-		if (_loadedProfile != null)
-		{
-			NameEntry.Text = _loadedProfile.Username ?? "";
-			WeightEntry.Text = _loadedProfile.WeightKg?.ToString() ?? "";
-			HeightEntry.Text = _loadedProfile.HeightCm?.ToString() ?? "";
-		}
+		SetEditing(false);
 
-		NameEntry.IsEnabled = false;
-		WeightEntry.IsEnabled = false;
-		HeightEntry.IsEnabled = false;
-		SaveButton.IsVisible = false;
-		CancelButton.IsVisible = false;
-		EditButton.IsVisible = true;
+		// revert to loaded profile values
+		if (_loadedProfile != null)
+			ShowProfile(_loadedProfile);
 	}
-	
 
 	private async void OnLogoutClicked(object? sender, EventArgs e)
 	{

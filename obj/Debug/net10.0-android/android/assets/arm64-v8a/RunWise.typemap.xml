@@ -1,10 +1,10 @@
-<api type="debug" assembly-name="RunWise" mvid="074dcdc7154b4a06ad9226875fb7c7e0">
+<api type="debug" assembly-name="RunWise" mvid="e73465c5679648d0bb8d1e38bbd0a13f">
   <java-to-managed>
-    <entry java-name="crc64040fd1429a0a3407/MainActivity" managed-name="RunWise.MainActivity, RunWise" managed-type-token-id="33554470" />
-    <entry java-name="crc64040fd1429a0a3407/MainApplication" managed-name="RunWise.MainApplication, RunWise" managed-type-token-id="33554471" />
+    <entry java-name="crc64040fd1429a0a3407/MainActivity" managed-name="RunWise.MainActivity, RunWise" managed-type-token-id="33554472" />
+    <entry java-name="crc64040fd1429a0a3407/MainApplication" managed-name="RunWise.MainApplication, RunWise" managed-type-token-id="33554473" />
   </java-to-managed>
   <managed-to-java>
-    <entry java-name="crc64040fd1429a0a3407/MainActivity" managed-name="RunWise.MainActivity, RunWise" managed-type-token-id="33554470" />
-    <entry java-name="crc64040fd1429a0a3407/MainApplication" managed-name="RunWise.MainApplication, RunWise" managed-type-token-id="33554471" />
+    <entry java-name="crc64040fd1429a0a3407/MainActivity" managed-name="RunWise.MainActivity, RunWise" managed-type-token-id="33554472" />
+    <entry java-name="crc64040fd1429a0a3407/MainApplication" managed-name="RunWise.MainApplication, RunWise" managed-type-token-id="33554473" />
   </managed-to-java>
 </api>

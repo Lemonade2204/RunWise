@@ -12,4 +12,7 @@ public class Profile
     public int? WeeklyAverageTimeSeconds { get; set; }
     public double? AllTimeDistanceKm { get; set; }
     public int? AllTimeTimeSeconds { get; set; }
+    // New profile fields
+    public DateTime? DateOfBirth { get; set; }
+    public string? Gender { get; set; }
 }

@@ -13,10 +13,16 @@
             </HorizontalStackLayout>
 
             <Label Text="Distance (km)" FontAttributes="Bold" />
-            <Entry Text="{Binding DistanceKm, Mode=TwoWay}" Keyboard="Numeric" />
+            <Entry Text="{Binding DistanceKm, Mode=TwoWay}" Keyboard="Numeric" TextChanged="OnDistanceChanged" />
 
             <Label Text="Duration (hh:mm:ss)" FontAttributes="Bold" />
-            <Entry Text="{Binding DurationText, Mode=TwoWay}" />
+            <Entry Text="{Binding DurationText, Mode=TwoWay}" TextChanged="OnDurationChanged" />
+
+            <Label Text="Steps" FontAttributes="Bold" />
+            <Label Text="{Binding StepsText}" FontAttributes="Bold" />
+
+            <Label Text="Calories" FontAttributes="Bold" />
+            <Label Text="{Binding CaloriesText, StringFormat='{0} kcal'}" FontAttributes="Bold" />
 
             <HorizontalStackLayout Spacing="12">
                 <Button Text="Save" Clicked="OnSaveClicked" />
