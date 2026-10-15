@@ -2,6 +2,7 @@
 <Application xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:RunWise"
+             xmlns:controls="clr-namespace:RunWise.Controls"
              x:Class="RunWise.App">
     <Application.Resources>
         <ResourceDictionary>
@@ -9,6 +10,15 @@
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- Wraps a page's content with the custom bottom navigation bar.
+                 The bar overlays the bottom so its raised Run button can float above the content. -->
+            <ControlTemplate x:Key="BottomNavPageTemplate">
+                <Grid RowSpacing="0">
+                    <ContentPresenter Margin="0,0,0,64" />
+                    <controls:BottomNavBar />
+                </Grid>
+            </ControlTemplate>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

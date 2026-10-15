@@ -335,20 +335,7 @@ public partial class ProfilePage : ContentPage
 	{
 		try
 		{
-			if (_auth != null)
-				await _auth.SignOutAsync();
-
-			// Clear local runs for the signed out session (optional)
-			try
-			{
-				var dataPath = Path.Combine(FileSystem.AppDataDirectory, "run_history.json");
-				if (File.Exists(dataPath))
-					File.Delete(dataPath);
-			}
-			catch { }
-
-			// Return to login screen
-			Application.Current.MainPage = new NavigationPage(new Pages.LoginPage());
+			await AppShell.LogOutAsync();
 		}
 		catch (Exception ex)
 		{

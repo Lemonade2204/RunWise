@@ -5,8 +5,115 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:RunWise"
     Title="RunWise"
-    Shell.FlyoutBehavior="Disabled"
+    Shell.FlyoutBehavior="Flyout"
+    Shell.TabBarIsVisible="False"
+    FlyoutBackgroundColor="White"
+    FlyoutWidth="290"
     >
+
+    <!-- Side drawer, opened from the "Menu" button in the bottom nav bar -->
+    <Shell.FlyoutContent>
+        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="0" BackgroundColor="White">
+            <Grid.Resources>
+                <Style x:Key="DrawerItem" TargetType="Border">
+                    <Setter Property="StrokeThickness" Value="0" />
+                    <Setter Property="Padding" Value="14,12" />
+                    <Setter Property="BackgroundColor" Value="Transparent" />
+                    <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+                </Style>
+                <Style x:Key="DrawerIcon" TargetType="Path">
+                    <Setter Property="WidthRequest" Value="24" />
+                    <Setter Property="HeightRequest" Value="24" />
+                    <Setter Property="Aspect" Value="None" />
+                    <Setter Property="VerticalOptions" Value="Center" />
+                    <Setter Property="Stroke" Value="#5B6275" />
+                    <Setter Property="StrokeThickness" Value="1.8" />
+                    <Setter Property="StrokeLineCap" Value="Round" />
+                    <Setter Property="StrokeLineJoin" Value="Round" />
+                </Style>
+                <Style x:Key="DrawerLabel" TargetType="Label">
+                    <Setter Property="FontSize" Value="15" />
+                    <Setter Property="TextColor" Value="#2B3040" />
+                    <Setter Property="VerticalOptions" Value="Center" />
+                </Style>
+            </Grid.Resources>
+
+            <!-- Header -->
+            <Grid Grid.Row="0" Padding="24,48,24,24">
+                <Grid.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#4A6CF7" Offset="0" />
+                        <GradientStop Color="#7B93FF" Offset="1" />
+                    </LinearGradientBrush>
+                </Grid.Background>
+                <VerticalStackLayout Spacing="6">
+                    <Border WidthRequest="52" HeightRequest="52" HorizontalOptions="Start"
+                            BackgroundColor="#33FFFFFF" StrokeThickness="0" Padding="0"
+                            StrokeShape="RoundRectangle 26" Margin="0,0,0,8">
+                        <Path Data="M9 6.5 L17.5 12 L9 17.5 Z" WidthRequest="24" HeightRequest="24" Aspect="None"
+                              HorizontalOptions="Center" VerticalOptions="Center"
+                              Stroke="White" StrokeThickness="2" StrokeLineJoin="Round" />
+                    </Border>
+                    <Label Text="RunWise" FontSize="24" FontAttributes="Bold" TextColor="White" />
+                    <Label Text="Run smarter, eat better" FontSize="13" TextColor="#E3E8FF" />
+                </VerticalStackLayout>
+            </Grid>
+
+            <!-- Menu items -->
+            <VerticalStackLayout Grid.Row="1" Padding="12,20,12,0" Spacing="4">
+                <Label Text="TRAINING &amp; NUTRITION" FontSize="11" FontAttributes="Bold"
+                       TextColor="#9AA0AE" Margin="14,0,0,6" CharacterSpacing="1" />
+
+                <Border x:Name="ExercisesItem" Style="{StaticResource DrawerItem}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnDrawerItemTapped" CommandParameter="exercises" />
+                    </Border.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="16">
+                        <Path x:Name="ExercisesIcon" Style="{StaticResource DrawerIcon}"
+                              Data="M6 7 V17 M3 9 V15 M18 7 V17 M21 9 V15 M6 12 H18" />
+                        <Label x:Name="ExercisesLabel" Style="{StaticResource DrawerLabel}" Text="Exercises" />
+                    </HorizontalStackLayout>
+                </Border>
+
+                <Border x:Name="FoodItem" Style="{StaticResource DrawerItem}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnDrawerItemTapped" CommandParameter="food" />
+                    </Border.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="16">
+                        <Path x:Name="FoodIcon" Style="{StaticResource DrawerIcon}"
+                              Data="M3 2 V9 C3 10.1 3.9 11 5 11 H9 A2 2 0 0 0 11 9 V2 M7 2 V22 M21 15 V2 A5 5 0 0 0 16 7 V13 C16 14.1 16.9 15 18 15 H21 Z M21 15 V22" />
+                        <Label x:Name="FoodLabel" Style="{StaticResource DrawerLabel}" Text="Food" />
+                    </HorizontalStackLayout>
+                </Border>
+
+                <Border x:Name="MealPlannerItem" Style="{StaticResource DrawerItem}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnDrawerItemTapped" CommandParameter="mealplanner" />
+                    </Border.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="16">
+                        <Path x:Name="MealPlannerIcon" Style="{StaticResource DrawerIcon}"
+                              Data="M5 4 H19 A2 2 0 0 1 21 6 V20 A2 2 0 0 1 19 22 H5 A2 2 0 0 1 3 20 V6 A2 2 0 0 1 5 4 Z M16 2 V6 M8 2 V6 M3 10 H21" />
+                        <Label x:Name="MealPlannerLabel" Style="{StaticResource DrawerLabel}" Text="Meal Planner" />
+                    </HorizontalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+
+            <!-- Footer -->
+            <VerticalStackLayout Grid.Row="2" Padding="12,0,12,24" Spacing="8">
+                <BoxView HeightRequest="1" BackgroundColor="#EEF0F5" Margin="14,0" />
+                <Border Style="{StaticResource DrawerItem}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnLogoutTapped" />
+                    </Border.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="16">
+                        <Path Style="{StaticResource DrawerIcon}" Stroke="#E5484D"
+                              Data="M9 21 H5 A2 2 0 0 1 3 19 V5 A2 2 0 0 1 5 3 H9 M16 17 L21 12 L16 7 M21 12 H9" />
+                        <Label Style="{StaticResource DrawerLabel}" Text="Log Out" TextColor="#E5484D" />
+                    </HorizontalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </Grid>
+    </Shell.FlyoutContent>
 
     <FlyoutItem FlyoutDisplayOptions="AsMultipleItems">
         <ShellContent
@@ -62,5 +169,5 @@
 
     </FlyoutItem>
 
-    
+
 </Shell>

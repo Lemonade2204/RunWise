@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Custom bottom navigation bar with a raised "Run" button in the middle.
+    The top 24px row is transparent so the Run button can float above the bar;
+    InputTransparent + CascadeInputTransparent=False lets taps in that empty strip
+    pass through to the page while the buttons themselves stay tappable.
+-->
+<Grid xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+      xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+      x:Class="RunWise.Controls.BottomNavBar"
+      HeightRequest="88"
+      VerticalOptions="End"
+      RowDefinitions="24,64"
+      ColumnDefinitions="*,*,*,76,*,*"
+      RowSpacing="0"
+      ColumnSpacing="0"
+      InputTransparent="True"
+      CascadeInputTransparent="False">
+
+    <Grid.Resources>
+        <Style x:Key="NavItem" TargetType="VerticalStackLayout">
+            <Setter Property="Grid.Row" Value="1" />
+            <Setter Property="Spacing" Value="3" />
+            <Setter Property="VerticalOptions" Value="Center" />
+            <Setter Property="HorizontalOptions" Value="Fill" />
+            <Setter Property="BackgroundColor" Value="Transparent" />
+        </Style>
+        <Style x:Key="NavIcon" TargetType="Path">
+            <Setter Property="WidthRequest" Value="24" />
+            <Setter Property="HeightRequest" Value="24" />
+            <Setter Property="Aspect" Value="None" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+            <Setter Property="Stroke" Value="#9AA0AE" />
+            <Setter Property="StrokeThickness" Value="1.8" />
+            <Setter Property="StrokeLineCap" Value="Round" />
+            <Setter Property="StrokeLineJoin" Value="Round" />
+        </Style>
+        <Style x:Key="NavLabel" TargetType="Label">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextColor" Value="#9AA0AE" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+        </Style>
+    </Grid.Resources>
+
+    <!-- White bar background -->
+    <Border Grid.Row="1"
+            Grid.ColumnSpan="6"
+            BackgroundColor="White"
+            StrokeThickness="0"
+            Padding="0">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="20,20,0,0" />
+        </Border.StrokeShape>
+        <Border.Shadow>
+            <Shadow Brush="#1A1F36" Opacity="0.08" Radius="16" Offset="0,-2" />
+        </Border.Shadow>
+    </Border>
+
+    <!-- Menu: opens the side drawer -->
+    <VerticalStackLayout Grid.Column="0" Style="{StaticResource NavItem}">
+        <VerticalStackLayout.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnMenuTapped" />
+        </VerticalStackLayout.GestureRecognizers>
+        <Path Style="{StaticResource NavIcon}" Data="M4 6 H20 M4 12 H20 M4 18 H20" />
+        <Label Style="{StaticResource NavLabel}" Text="Menu" />
+    </VerticalStackLayout>
+
+    <!-- Home -->
+    <VerticalStackLayout Grid.Column="1" Style="{StaticResource NavItem}">
+        <VerticalStackLayout.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnTabTapped" CommandParameter="home" />
+        </VerticalStackLayout.GestureRecognizers>
+        <Path x:Name="HomeIcon"
+              Style="{StaticResource NavIcon}"
+              Data="M3 10 L12 3 L21 10 V19 A2 2 0 0 1 19 21 H5 A2 2 0 0 1 3 19 Z M9 21 V14 A1 1 0 0 1 10 13 H14 A1 1 0 0 1 15 14 V21" />
+        <Label x:Name="HomeLabel" Style="{StaticResource NavLabel}" Text="Home" />
+    </VerticalStackLayout>
+
+    <!-- Map -->
+    <VerticalStackLayout Grid.Column="2" Style="{StaticResource NavItem}">
+        <VerticalStackLayout.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnTabTapped" CommandParameter="maps" />
+        </VerticalStackLayout.GestureRecognizers>
+        <Path x:Name="MapIcon"
+              Style="{StaticResource NavIcon}"
+              Data="M3 6 L9 3 L15 6 L21 3 V18 L15 21 L9 18 L3 21 Z M9 3 V18 M15 6 V21" />
+        <Label x:Name="MapLabel" Style="{StaticResource NavLabel}" Text="Map" />
+    </VerticalStackLayout>
+
+    <!-- Run (raised center button) -->
+    <Border Grid.Column="3"
+            Grid.RowSpan="2"
+            WidthRequest="60"
+            HeightRequest="60"
+            Margin="0,2,0,0"
+            VerticalOptions="Start"
+            HorizontalOptions="Center"
+            BackgroundColor="#4A6CF7"
+            StrokeThickness="0"
+            Padding="0">
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="30" />
+        </Border.StrokeShape>
+        <Border.Shadow>
+            <Shadow Brush="#4A6CF7" Opacity="0.35" Radius="14" Offset="0,6" />
+        </Border.Shadow>
+        <Border.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnTabTapped" CommandParameter="run" />
+        </Border.GestureRecognizers>
+        <Path Data="M9 6.5 L17.5 12 L9 17.5 Z"
+              WidthRequest="24"
+              HeightRequest="24"
+              Aspect="None"
+              HorizontalOptions="Center"
+              VerticalOptions="Center"
+              Stroke="White"
+              StrokeThickness="2"
+              StrokeLineJoin="Round" />
+    </Border>
+
+    <!-- History -->
+    <VerticalStackLayout Grid.Column="4" Style="{StaticResource NavItem}">
+        <VerticalStackLayout.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnTabTapped" CommandParameter="history" />
+        </VerticalStackLayout.GestureRecognizers>
+        <Path x:Name="HistoryIcon"
+              Style="{StaticResource NavIcon}"
+              Data="M3 12 A9 9 0 1 0 12 3 A9.75 9.75 0 0 0 5.26 5.74 L3 8 M3 3 V8 H8 M12 7 V12 L16 14" />
+        <Label x:Name="HistoryLabel" Style="{StaticResource NavLabel}" Text="History" />
+    </VerticalStackLayout>
+
+    <!-- Profile -->
+    <VerticalStackLayout Grid.Column="5" Style="{StaticResource NavItem}">
+        <VerticalStackLayout.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnTabTapped" CommandParameter="profile" />
+        </VerticalStackLayout.GestureRecognizers>
+        <Path x:Name="ProfileIcon"
+              Style="{StaticResource NavIcon}"
+              Data="M19 21 V19 A4 4 0 0 0 15 15 H9 A4 4 0 0 0 5 19 V21 M8 7 A4 4 0 1 0 16 7 A4 4 0 1 0 8 7" />
+        <Label x:Name="ProfileLabel" Style="{StaticResource NavLabel}" Text="Profile" />
+    </VerticalStackLayout>
+</Grid>

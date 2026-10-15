@@ -1,6 +1,5 @@
 using Microsoft.Maui.Controls;
 using RunWise.ViewModels;
-using RunWise.Models;
 
 namespace RunWise.Pages;
 
@@ -9,194 +8,85 @@ public partial class MealPlannerPage : ContentPage
     public MealPlannerPage()
     {
         InitializeComponent();
-        // Attach click handlers for Add buttons (avoid XAML event wiring to prevent hot-reload issues)
-        try
-        {
-            var b1 = this.FindByName<Button>("BreakfastAddButton");
-            if (b1 != null) b1.Clicked += OnSearchAddBreakfastClicked;
-            var b2 = this.FindByName<Button>("LunchAddButton");
-            if (b2 != null) b2.Clicked += OnSearchAddLunchClicked;
-            var b3 = this.FindByName<Button>("DinnerAddButton");
-            if (b3 != null) b3.Clicked += OnSearchAddDinnerClicked;
-            // make the date area open the native DatePicker when tapped
-            var dateArea = this.FindByName<StackLayout>("DateTapArea");
-            if (dateArea != null)
-            {
-                var tap = new TapGestureRecognizer();
-                tap.Tapped += (s, e) =>
-                {
-                    try
-                    {
-                        var dp = this.FindByName<DatePicker>("DatePicker");
-                        Device.BeginInvokeOnMainThread(() => dp?.Focus());
-                    }
-                    catch { }
-                };
-                dateArea.GestureRecognizers.Add(tap);
-            }
-        }
-        catch { }
     }
 
-    public void OnDateTapped(object sender, TappedEventArgs e)
+    private MealPlannerViewModel? Vm => BindingContext as MealPlannerViewModel;
+
+    protected override async void OnAppearing()
+    {
+        base.OnAppearing();
+        // pick up items added from the Food page
+        if (Vm != null) await Vm.RefreshAsync();
+    }
+
+    private void OnDateTapped(object? sender, TappedEventArgs e)
+    {
+        try { MainThread.BeginInvokeOnMainThread(() => DatePicker.Focus()); } catch { }
+    }
+
+    private void OnDayTapped(object? sender, TappedEventArgs e)
+    {
+        if (e.Parameter is WeekDayItem day && Vm != null) Vm.SelectedDate = day.Date;
+    }
+
+    private async void OnGoalTapped(object? sender, TappedEventArgs e)
+    {
+        if (Vm == null) return;
+        var input = await DisplayPromptAsync("Daily calorie goal", "Calories per day:",
+            initialValue: Vm.CalorieGoal.ToString(), keyboard: Keyboard.Numeric, maxLength: 5);
+        if (string.IsNullOrWhiteSpace(input)) return;
+        if (!int.TryParse(input, out var goal) || goal <= 0)
+        {
+            await DisplayAlertAsync("Invalid", "Goal must be a positive number", "OK");
+            return;
+        }
+        Vm.CalorieGoal = goal;
+    }
+
+    private async void OnAddItemClicked(object? sender, EventArgs e)
+    {
+        if (sender is BindableObject b && b.BindingContext is MealSection section)
+            await GoToFoodAsync(section.Type.ToString());
+    }
+
+    private async void OnLogFoodClicked(object? sender, EventArgs e) => await GoToFoodAsync(null);
+
+    private async Task GoToFoodAsync(string? meal)
     {
         try
         {
-            var dp = this.FindByName<DatePicker>("DatePicker");
-            if (dp != null)
-            {
-                Device.BeginInvokeOnMainThread(() => dp.Focus());
-            }
-        }
-        catch { }
-    }
-
-    // Overload with EventArgs in case XAML resolves a non-generic signature
-    public void OnDateTapped(object sender, EventArgs e)
-    {
-        try
-        {
-            var dp = this.FindByName<DatePicker>("DatePicker");
-            if (dp != null)
-            {
-                Device.BeginInvokeOnMainThread(() => dp.Focus());
-            }
-        }
-        catch { }
-    }
-
-    protected override void OnBindingContextChanged()
-    {
-        base.OnBindingContextChanged();
-        // ensure DatePicker selection is synced when binding context available
-        if (BindingContext is RunWise.ViewModels.MealPlannerViewModel vm)
-        {
-            try
-            {
-                var dp = this.FindByName<DatePicker>("DatePicker");
-                if (dp != null) dp.Date = vm.SelectedDate;
-            }
-            catch { }
-        }
-    }
-
-    private async void OnSearchAddBreakfastClicked(object sender, EventArgs e)
-    {
-        try
-        {
-            var entry = this.FindByName<Entry>("BreakfastEntry");
-            var query = (entry?.Text ?? string.Empty).Trim();
-            // If there's text in the quick-add entry, add directly to VM/store; otherwise navigate to Food search
-            if (!string.IsNullOrWhiteSpace(query))
-            {
-                if (BindingContext is RunWise.ViewModels.MealPlannerViewModel vm)
-                {
-                    // ensure NewBreakfastText is set and execute add
-                    vm.NewBreakfastText = query;
-                    await vm.AddBreakfastAsync();
-                    // clear entry after add
-                    entry.Text = string.Empty;
-                }
-                return;
-            }
-
-            await Shell.Current.GoToAsync($"//food?search={Uri.EscapeDataString(query)}&meal=Breakfast");
+            var date = (Vm?.SelectedDate ?? DateTime.Today).ToString("yyyy-MM-dd");
+            var route = $"//food?date={date}";
+            if (!string.IsNullOrEmpty(meal)) route += $"&meal={meal}";
+            await Shell.Current.GoToAsync(route);
         }
         catch (Exception ex)
         {
-            await DisplayAlert("Navigation error", ex.Message, "OK");
+            await DisplayAlertAsync("Navigation error", ex.Message, "OK");
         }
     }
 
-    private async void OnSearchAddLunchClicked(object sender, EventArgs e)
+    private async void OnDeleteTapped(object? sender, TappedEventArgs e)
     {
-        try
-        {
-            var entry = this.FindByName<Entry>("LunchEntry");
-            var query = (entry?.Text ?? string.Empty).Trim();
-            if (!string.IsNullOrWhiteSpace(query))
-            {
-                if (BindingContext is RunWise.ViewModels.MealPlannerViewModel vm)
-                {
-                    vm.NewLunchText = query;
-                    await vm.AddLunchAsync();
-                    entry.Text = string.Empty;
-                }
-                return;
-            }
-
-            await Shell.Current.GoToAsync($"//food?search={Uri.EscapeDataString(query)}&meal=Lunch");
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("Navigation error", ex.Message, "OK");
-        }
+        if (e.Parameter is not MealRow row || Vm == null) return;
+        var ok = await DisplayAlertAsync("Remove item", $"Remove {row.Name}?", "Remove", "Cancel");
+        if (ok) await Vm.DeleteMealAsync(row.Item);
     }
 
-    private async void OnSearchAddDinnerClicked(object sender, EventArgs e)
+    private async void OnMealTapped(object? sender, TappedEventArgs e)
     {
-        try
+        if (e.Parameter is not MealRow row || Vm == null) return;
+        var meal = row.Item;
+        var newName = await DisplayPromptAsync("Edit", "Name:", initialValue: meal.Name);
+        if (string.IsNullOrWhiteSpace(newName)) return;
+        var calStr = await DisplayPromptAsync("Edit", "Calories:", initialValue: meal.Calories.ToString(), keyboard: Keyboard.Numeric);
+        if (!int.TryParse(calStr, out var cal) || cal < 0)
         {
-            var entry = this.FindByName<Entry>("DinnerEntry");
-            var query = (entry?.Text ?? string.Empty).Trim();
-            if (!string.IsNullOrWhiteSpace(query))
-            {
-                if (BindingContext is RunWise.ViewModels.MealPlannerViewModel vm)
-                {
-                    vm.NewDinnerText = query;
-                    await vm.AddDinnerAsync();
-                    entry.Text = string.Empty;
-                }
-                return;
-            }
-
-            await Shell.Current.GoToAsync($"//food?search={Uri.EscapeDataString(query)}&meal=Dinner");
+            await DisplayAlertAsync("Invalid", "Calories must be a non-negative number", "OK");
+            return;
         }
-        catch (Exception ex)
-        {
-            await DisplayAlert("Navigation error", ex.Message, "OK");
-        }
-    }
-
-    private async void OnDeleteMealInvoked(object sender, EventArgs e)
-    {
-        try
-        {
-            if (sender is SwipeItem si && si.BindingContext is MealItem meal)
-            {
-                var ok = await DisplayAlert("Delete", $"Delete {meal.Name}?", "Delete", "Cancel");
-                if (!ok) return;
-                if (BindingContext is MealPlannerViewModel vm)
-                {
-                    await vm.DeleteMealAsync(meal);
-                }
-            }
-        }
-        catch { }
-    }
-
-    private async void OnEditMealInvoked(object sender, EventArgs e)
-    {
-        try
-        {
-            if (sender is SwipeItem si && si.BindingContext is MealItem meal)
-            {
-                var newName = await DisplayPromptAsync("Edit", "Name:", initialValue: meal.Name);
-                if (string.IsNullOrWhiteSpace(newName)) return;
-                var calStr = await DisplayPromptAsync("Edit", "Calories:", initialValue: meal.Calories.ToString(), keyboard: Keyboard.Numeric);
-                if (!int.TryParse(calStr, out var cal) || cal < 0)
-                {
-                    await DisplayAlert("Invalid", "Calories must be a non-negative number", "OK");
-                    return;
-                }
-                meal.Name = newName.Trim();
-                meal.Calories = cal;
-                if (BindingContext is MealPlannerViewModel vm)
-                {
-                    await vm.UpdateMealAsync(meal);
-                }
-            }
-        }
-        catch { }
+        meal.Name = newName.Trim();
+        meal.Calories = cal;
+        await Vm.UpdateMealAsync(meal);
     }
 }

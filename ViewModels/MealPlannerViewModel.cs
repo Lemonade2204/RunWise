@@ -1,170 +1,211 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
 using Microsoft.Maui.ApplicationModel;
 using Microsoft.Maui.Controls;
+using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Storage;
 using RunWise.Models;
 
 namespace RunWise.ViewModels
 {
+    // One cell of the Mon-Sun week strip
+    public class WeekDayItem
+    {
+        public DateTime Date { get; init; }
+        public bool IsSelected { get; init; }
+        public bool IsToday { get; init; }
+        public string DayName => Date.ToString("ddd");
+        public string DayNumber => Date.Day.ToString();
+        public Color CellBackground => IsSelected ? Color.FromArgb("#4A6CF7") : Colors.White;
+        public Color CellStroke => IsSelected ? Color.FromArgb("#4A6CF7") : Color.FromArgb("#E6EAF3");
+        public Color DayNameColor => IsSelected ? Color.FromArgb("#DCE3FF") : Color.FromArgb("#9AA3B5");
+        public Color DayNumberColor => IsSelected ? Colors.White : (IsToday ? Color.FromArgb("#4A6CF7") : Color.FromArgb("#1B2237"));
+        public Color DotColor => IsSelected ? Colors.White : Color.FromArgb("#4A6CF7");
+    }
+
+    // Display wrapper for a meal entry (keeps MealItem free of UI-only properties)
+    public class MealRow
+    {
+        public MealRow(MealItem item) { Item = item; }
+        public MealItem Item { get; }
+        public string Name => string.IsNullOrWhiteSpace(Item.Name) ? "(item)" : Item.Name;
+        public int Servings => (int)Math.Max(1, Math.Round(Item.Quantity));
+        public int TotalCalories => Item.Calories * Servings;
+        public string Detail => !string.IsNullOrWhiteSpace(Item.Notes)
+            ? Item.Notes!
+            : (Servings == 1 ? "1 serving" : $"{Servings} servings");
+        public string CaloriesText => $"{TotalCalories:N0} kcal";
+    }
+
+    public class MealSection : INotifyPropertyChanged
+    {
+        public MealSection(MealType type, string title, string addText)
+        {
+            Type = type;
+            Title = title;
+            AddText = addText;
+        }
+
+        public MealType Type { get; }
+        public string Title { get; }
+        public string AddText { get; }
+        public ObservableCollection<MealRow> Items { get; } = new ObservableCollection<MealRow>();
+
+        public int Calories => Items.Sum(i => i.TotalCalories);
+        public string CaloriesText => $"{Calories:N0} kcal";
+        public bool IsEmpty => Items.Count == 0;
+        public bool HasItems => Items.Count > 0;
+        public string Subtitle => Items.Count == 0 ? "No items added yet" : (Items.Count == 1 ? "1 item" : $"{Items.Count} items");
+
+        public void SetItems(IEnumerable<MealItem> meals)
+        {
+            Items.Clear();
+            foreach (var m in meals) Items.Add(new MealRow(m));
+            OnPropertyChanged(nameof(Calories));
+            OnPropertyChanged(nameof(CaloriesText));
+            OnPropertyChanged(nameof(IsEmpty));
+            OnPropertyChanged(nameof(HasItems));
+            OnPropertyChanged(nameof(Subtitle));
+        }
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+        private void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+    }
+
     public class MealPlannerViewModel : INotifyPropertyChanged
     {
-        public ObservableCollection<MealItem> Breakfast { get; } = new ObservableCollection<MealItem>();
-        public ObservableCollection<MealItem> Lunch { get; } = new ObservableCollection<MealItem>();
-        public ObservableCollection<MealItem> Dinner { get; } = new ObservableCollection<MealItem>();
+        private const string CalorieGoalKey = "runwise_calorie_goal";
+        private const int DefaultCalorieGoal = 2000;
 
-        public string NewBreakfastText { get; set; } = string.Empty;
-        public string NewLunchText { get; set; } = string.Empty;
-        public string NewDinnerText { get; set; } = string.Empty;
-        public int TodayTotalCalories { get; set; }
-        public string TodayTotalCaloriesDisplay => $"{TodayTotalCalories} kcal";
-        public bool NoMeals => TodayTotalCalories == 0;
+        public MealSection Breakfast { get; } = new MealSection(MealType.Breakfast, "Breakfast", "Add breakfast item");
+        public MealSection Lunch { get; } = new MealSection(MealType.Lunch, "Lunch", "Add lunch item");
+        public MealSection Dinner { get; } = new MealSection(MealType.Dinner, "Dinner", "Add dinner item");
+        public MealSection Snacks { get; } = new MealSection(MealType.Snack, "Snacks", "Add a snack");
+        public IReadOnlyList<MealSection> Sections { get; }
+
+        public ObservableCollection<WeekDayItem> WeekDays { get; } = new ObservableCollection<WeekDayItem>();
+
+        private int _todayTotalCalories;
+        public int TodayTotalCalories
+        {
+            get => _todayTotalCalories;
+            private set { _todayTotalCalories = value; OnPropertyChanged(nameof(TodayTotalCalories)); NotifyGoalDerived(); }
+        }
+
+        private int _calorieGoal;
+        public int CalorieGoal
+        {
+            get => _calorieGoal;
+            set
+            {
+                var v = Math.Max(1, value);
+                if (_calorieGoal == v) return;
+                _calorieGoal = v;
+                try { Preferences.Set(CalorieGoalKey, v); } catch { }
+                OnPropertyChanged(nameof(CalorieGoal));
+                NotifyGoalDerived();
+            }
+        }
+
+        public string GoalText => $"Goal: {CalorieGoal:N0} kcal";
+        public double GoalProgress => Math.Clamp(TodayTotalCalories / (double)CalorieGoal, 0, 1);
+        public string GoalCaption
+        {
+            get
+            {
+                if (TodayTotalCalories == 0) return "Your day is ready to plan.";
+                var left = CalorieGoal - TodayTotalCalories;
+                return left >= 0
+                    ? $"{left:N0} kcal left of your {CalorieGoal:N0} goal"
+                    : $"{-left:N0} kcal over your {CalorieGoal:N0} goal";
+            }
+        }
+
         private int _itemsPlannedCount;
         public int ItemsPlannedCount
         {
             get => _itemsPlannedCount;
-            set { if (_itemsPlannedCount != value) { _itemsPlannedCount = value; OnPropertyChanged(nameof(ItemsPlannedCount)); } }
+            private set { _itemsPlannedCount = value; OnPropertyChanged(nameof(ItemsPlannedCount)); OnPropertyChanged(nameof(ItemsPlannedText)); }
         }
+        public string ItemsPlannedText => ItemsPlannedCount == 1 ? "1 item planned" : $"{ItemsPlannedCount} items planned";
 
-        private int _breakfastCalories;
-        public int BreakfastCalories
-        {
-            get => _breakfastCalories;
-            set { if (_breakfastCalories != value) { _breakfastCalories = value; OnPropertyChanged(nameof(BreakfastCalories)); } }
-        }
+        public bool IsToday => SelectedDate.Date == DateTime.Today;
+        public bool IsNotToday => !IsToday;
 
-        private int _lunchCalories;
-        public int LunchCalories
-        {
-            get => _lunchCalories;
-            set { if (_lunchCalories != value) { _lunchCalories = value; OnPropertyChanged(nameof(LunchCalories)); } }
-        }
-
-        private int _dinnerCalories;
-        public int DinnerCalories
-        {
-            get => _dinnerCalories;
-            set { if (_dinnerCalories != value) { _dinnerCalories = value; OnPropertyChanged(nameof(DinnerCalories)); } }
-        }
-
-        private bool _isToday;
-        public bool IsToday
-        {
-            get => _isToday;
-            set { if (_isToday != value) { _isToday = value; OnPropertyChanged(nameof(IsToday)); } }
-        }
-
-        private bool _breakfastEmpty = true;
-        public bool BreakfastEmpty
-        {
-            get => _breakfastEmpty;
-            set { if (_breakfastEmpty != value) { _breakfastEmpty = value; OnPropertyChanged(nameof(BreakfastEmpty)); } }
-        }
-
-        private bool _lunchEmpty = true;
-        public bool LunchEmpty
-        {
-            get => _lunchEmpty;
-            set { if (_lunchEmpty != value) { _lunchEmpty = value; OnPropertyChanged(nameof(LunchEmpty)); } }
-        }
-
-        private bool _dinnerEmpty = true;
-        public bool DinnerEmpty
-        {
-            get => _dinnerEmpty;
-            set { if (_dinnerEmpty != value) { _dinnerEmpty = value; OnPropertyChanged(nameof(DinnerEmpty)); } }
-        }
-        // Selected date for which calories are shown
         private DateTime _selectedDate = DateTime.Today;
         public DateTime SelectedDate
         {
             get => _selectedDate;
             set
             {
-                if (_selectedDate != value)
-                {
-                    _selectedDate = value;
-                    OnPropertyChanged(nameof(SelectedDate));
-                    _ = LoadForDateAsync(_selectedDate);
-                }
+                if (_selectedDate.Date == value.Date) return;
+                _selectedDate = value.Date;
+                OnPropertyChanged(nameof(SelectedDate));
+                OnPropertyChanged(nameof(IsToday));
+                OnPropertyChanged(nameof(IsNotToday));
+                BuildWeek();
+                _ = LoadForDateAsync(_selectedDate);
             }
         }
 
-        public ICommand AddBreakfastCommand { get; }
-        public ICommand AddLunchCommand { get; }
-        public ICommand AddDinnerCommand { get; }
-        public ICommand ClearAllCommand { get; }
-        public ICommand DeleteMealCommand { get; }
-        public ICommand UpdateMealCommand { get; }
         public ICommand PrevDateCommand { get; }
         public ICommand NextDateCommand { get; }
         public ICommand GoToTodayCommand { get; }
+        public ICommand SelectDayCommand { get; }
 
         private readonly Services.MealStore _store;
 
         public MealPlannerViewModel()
         {
             _store = MauiProgram.Services.GetService(typeof(Services.MealStore)) as Services.MealStore ?? new Services.MealStore();
+            Sections = new[] { Breakfast, Lunch, Dinner, Snacks };
 
-            AddBreakfastCommand = new Command(async () => await AddBreakfastAsync());
-            AddLunchCommand = new Command(async () => await AddLunchAsync());
-            AddDinnerCommand = new Command(async () => await AddDinnerAsync());
-            ClearAllCommand = new Command(async () => await ClearAllAsync());
-            DeleteMealCommand = new Command(async (m) => await DeleteMealAsync(m as MealItem));
-            UpdateMealCommand = new Command(async (m) => await UpdateMealAsync(m as MealItem));
+            try { _calorieGoal = Preferences.Get(CalorieGoalKey, DefaultCalorieGoal); } catch { _calorieGoal = DefaultCalorieGoal; }
+            if (_calorieGoal <= 0) _calorieGoal = DefaultCalorieGoal;
+
             PrevDateCommand = new Command(() => SelectedDate = SelectedDate.AddDays(-1));
             NextDateCommand = new Command(() => SelectedDate = SelectedDate.AddDays(1));
             GoToTodayCommand = new Command(() => SelectedDate = DateTime.Today);
+            SelectDayCommand = new Command<WeekDayItem>(d => { if (d != null) SelectedDate = d.Date; });
 
-            // Seed with simple suggestions
-            Breakfast.Add(new MealItem { Name = "Oatmeal with fruit", Calories = 350 });
-            Lunch.Add(new MealItem { Name = "Grilled chicken salad", Calories = 450 });
-            Dinner.Add(new MealItem { Name = "Salmon with veggies", Calories = 600 });
-
-            // load selected date's meals from store
-            _ = LoadTodayAsync();
+            BuildWeek();
+            _ = LoadForDateAsync(SelectedDate);
             _store.MealsChanged += async () => await LoadForDateAsync(SelectedDate);
         }
 
-        private async System.Threading.Tasks.Task LoadTodayAsync()
+        public System.Threading.Tasks.Task RefreshAsync() => LoadForDateAsync(SelectedDate);
+
+        private void BuildWeek()
         {
-            await LoadForDateAsync(SelectedDate);
+            // Week runs Monday..Sunday
+            var offset = ((int)SelectedDate.DayOfWeek + 6) % 7;
+            var monday = SelectedDate.Date.AddDays(-offset);
+            WeekDays.Clear();
+            for (int i = 0; i < 7; i++)
+            {
+                var d = monday.AddDays(i);
+                WeekDays.Add(new WeekDayItem { Date = d, IsSelected = d == SelectedDate.Date, IsToday = d == DateTime.Today });
+            }
         }
 
         private async System.Threading.Tasks.Task LoadForDateAsync(DateTime date)
         {
             var meals = await _store.GetMealsForDateAsync(date.Date);
-            // replace collections
+            // Ignore stale results if the user already moved to another day
+            if (date.Date != SelectedDate.Date) return;
+
+            var total = meals.Sum(x => x.Calories * (int)Math.Max(1, Math.Round(x.Quantity)));
+
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                Breakfast.Clear(); Lunch.Clear(); Dinner.Clear();
-                foreach (var m in meals.Where(x => x.Type == MealType.Breakfast)) Breakfast.Add(m);
-                foreach (var m in meals.Where(x => x.Type == MealType.Lunch)) Lunch.Add(m);
-                foreach (var m in meals.Where(x => x.Type == MealType.Dinner)) Dinner.Add(m);
-                // update total for that date
-                TodayTotalCalories = meals.Sum(x => x.Calories * (int)Math.Max(1, Math.Round(x.Quantity)));
-                OnPropertyChanged(nameof(TodayTotalCalories));
-                // notify derived properties
-                OnPropertyChanged(nameof(TodayTotalCaloriesDisplay));
-                OnPropertyChanged(nameof(NoMeals));
-
-                // per-meal calories and counts
-                BreakfastCalories = Breakfast.Sum(x => x.Calories * (int)Math.Max(1, Math.Round(x.Quantity)));
-                LunchCalories = Lunch.Sum(x => x.Calories * (int)Math.Max(1, Math.Round(x.Quantity)));
-                DinnerCalories = Dinner.Sum(x => x.Calories * (int)Math.Max(1, Math.Round(x.Quantity)));
-                ItemsPlannedCount = Breakfast.Count + Lunch.Count + Dinner.Count;
-                BreakfastEmpty = Breakfast.Count == 0;
-                LunchEmpty = Lunch.Count == 0;
-                DinnerEmpty = Dinner.Count == 0;
-                IsToday = date.Date == DateTime.Today;
-                // notify any other bindings
-                OnPropertyChanged(nameof(BreakfastCalories));
-                OnPropertyChanged(nameof(LunchCalories));
-                OnPropertyChanged(nameof(DinnerCalories));
-                OnPropertyChanged(nameof(ItemsPlannedCount));
-                OnPropertyChanged(nameof(IsToday));
+                foreach (var s in Sections)
+                    s.SetItems(meals.Where(x => x.Type == s.Type));
+                TodayTotalCalories = total;
+                ItemsPlannedCount = Sections.Sum(s => s.Items.Count);
             });
 
             // Persist daily summary to Supabase (best-effort)
@@ -173,100 +214,31 @@ namespace RunWise.ViewModels
                 var sup = MauiProgram.Services.GetService(typeof(Services.SupabaseDatabaseService)) as Services.SupabaseDatabaseService;
                 if (sup != null)
                 {
-                    _ = sup.UpsertCalorieSummaryAsync(date.Date, TodayTotalCalories);
+                    _ = sup.UpsertCalorieSummaryAsync(date.Date, total);
                 }
             }
             catch { }
-        }
-
-        public async System.Threading.Tasks.Task AddBreakfastAsync()
-        {
-            if (!string.IsNullOrWhiteSpace(NewBreakfastText))
-            {
-                var item = new MealItem { Name = NewBreakfastText.Trim(), Type = MealType.Breakfast, Date = SelectedDate.Date };
-                await _store.AddMealAsync(item);
-                try
-                {
-                    var sup = MauiProgram.Services.GetService(typeof(Services.SupabaseDatabaseService)) as Services.SupabaseDatabaseService;
-                    if (sup != null)
-                    {
-                        _ = await sup.CreateMealAsync(item);
-                    }
-                }
-                catch { }
-                NewBreakfastText = string.Empty;
-                OnPropertyChanged(nameof(NewBreakfastText));
-                // refresh today's view after adding
-                await LoadTodayAsync();
-            }
-        }
-
-        public async System.Threading.Tasks.Task AddLunchAsync()
-        {
-            if (!string.IsNullOrWhiteSpace(NewLunchText))
-            {
-                var item = new MealItem { Name = NewLunchText.Trim(), Type = MealType.Lunch, Date = SelectedDate.Date };
-                await _store.AddMealAsync(item);
-                try
-                {
-                    var sup = MauiProgram.Services.GetService(typeof(Services.SupabaseDatabaseService)) as Services.SupabaseDatabaseService;
-                    if (sup != null)
-                    {
-                        _ = await sup.CreateMealAsync(item);
-                    }
-                }
-                catch { }
-                NewLunchText = string.Empty;
-                OnPropertyChanged(nameof(NewLunchText));
-                // refresh today's view after adding
-                await LoadTodayAsync();
-            }
-        }
-
-        public async System.Threading.Tasks.Task AddDinnerAsync()
-        {
-            if (!string.IsNullOrWhiteSpace(NewDinnerText))
-            {
-                var item = new MealItem { Name = NewDinnerText.Trim(), Type = MealType.Dinner, Date = SelectedDate.Date };
-                await _store.AddMealAsync(item);
-                try
-                {
-                    var sup = MauiProgram.Services.GetService(typeof(Services.SupabaseDatabaseService)) as Services.SupabaseDatabaseService;
-                    if (sup != null)
-                    {
-                        _ = await sup.CreateMealAsync(item);
-                    }
-                }
-                catch { }
-                NewDinnerText = string.Empty;
-                OnPropertyChanged(nameof(NewDinnerText));
-                // refresh today's view after adding
-                await LoadTodayAsync();
-            }
-        }
-
-        private async System.Threading.Tasks.Task ClearAllAsync()
-        {
-            // delete all today's meals
-            var today = DateTime.Today;
-            var meals = await _store.GetMealsForDateAsync(today);
-            foreach (var m in meals)
-                await _store.DeleteMealAsync(m);
-            await LoadTodayAsync();
         }
 
         public async System.Threading.Tasks.Task DeleteMealAsync(MealItem meal)
         {
             if (meal == null) return;
             await _store.DeleteMealAsync(meal);
-            await LoadTodayAsync();
+            await LoadForDateAsync(SelectedDate);
         }
 
         public async System.Threading.Tasks.Task UpdateMealAsync(MealItem meal)
         {
             if (meal == null) return;
             await _store.UpdateMealAsync(meal);
-            await LoadTodayAsync();
+            await LoadForDateAsync(SelectedDate);
+        }
+
+        private void NotifyGoalDerived()
+        {
+            OnPropertyChanged(nameof(GoalText));
+            OnPropertyChanged(nameof(GoalProgress));
+            OnPropertyChanged(nameof(GoalCaption));
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;

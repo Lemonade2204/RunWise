@@ -3,9 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:RunWise.ViewModels"
              x:Class="RunWise.Pages.HistoryPage"
+             ControlTemplate="{StaticResource BottomNavPageTemplate}"
              x:Name="ThisPage"
              BackgroundColor="#F7F8FC"
-             Shell.NavBarIsVisible="False"
+             Shell.BackgroundColor="#4B6BFB"
+             Shell.TitleColor= "White"
+            Shell.NavBarIsVisible="True"
              Title="Run History">
 
     <ContentPage.BindingContext>
@@ -13,12 +16,9 @@
     </ContentPage.BindingContext>
 
     <Grid RowDefinitions="Auto,*">
-
         <!-- Header with summary stats (larger cards, no filters) -->
         <Grid Grid.Row="0" BackgroundColor="#4B6BFB" Padding="16,28,16,22" RowSpacing="14"
               RowDefinitions="Auto,Auto">
-            <Label Text="Run History" FontSize="24" FontAttributes="Bold" TextColor="White"/>
-
             <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
                 <Border Grid.Column="0" BackgroundColor="#6783FC" StrokeThickness="0" Padding="12,12"
                         StrokeShape="RoundRectangle 20">
