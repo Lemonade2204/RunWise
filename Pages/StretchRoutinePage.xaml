@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:RunWise.ViewModels"
+             x:Class="RunWise.Pages.StretchRoutinePage"
+             x:DataType="vm:StretchRoutineViewModel"
+             Shell.NavBarIsVisible="False"
+             Title="{Binding PageTitle}"
+             BackgroundColor="White">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Color x:Key="Accent">#5B3CDD</Color>
+            <Color x:Key="AccentDark">#4A2BCB</Color>
+            <Color x:Key="AccentSoft">#F1EEFC</Color>
+            <Color x:Key="AccentTint">#F6F4FE</Color>
+            <Color x:Key="TextDark">#1B1B2F</Color>
+            <Color x:Key="TextMuted">#7A7A8C</Color>
+            <Color x:Key="CardStroke">#ECEAF4</Color>
+
+            <Style x:Key="LevelPill" TargetType="Border">
+                <Setter Property="StrokeThickness" Value="0" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 10" />
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="HeightRequest" Value="36" />
+            </Style>
+
+            <Style x:Key="LevelLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="TextColor" Value="{StaticResource AccentDark}" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+
+            <Style x:Key="LevelDot" TargetType="Ellipse">
+                <Setter Property="WidthRequest" Value="5" />
+                <Setter Property="HeightRequest" Value="5" />
+                <Setter Property="Fill" Value="{StaticResource Accent}" />
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="Margin" Value="5,0,0,0" />
+            </Style>
+
+            <Style x:Key="MetaIcon" TargetType="Path">
+                <Setter Property="WidthRequest" Value="14" />
+                <Setter Property="HeightRequest" Value="14" />
+                <Setter Property="Aspect" Value="Uniform" />
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="Stroke" Value="White" />
+                <Setter Property="StrokeThickness" Value="2" />
+                <Setter Property="StrokeLineCap" Value="Round" />
+                <Setter Property="StrokeLineJoin" Value="Round" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16,12,16,24" Spacing="16">
+
+            <!-- ============ HEADER ============ -->
+            <Grid ColumnDefinitions="40,*,40">
+                <Border WidthRequest="40" HeightRequest="40" StrokeThickness="0"
+                        StrokeShape="RoundRectangle 12" BackgroundColor="{StaticResource AccentSoft}">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnBackTapped" />
+                    </Border.GestureRecognizers>
+                    <Path Data="M12 4 L6 10 L12 16" WidthRequest="20" HeightRequest="20" Aspect="None"
+                          HorizontalOptions="Center" VerticalOptions="Center"
+                          Stroke="{StaticResource Accent}" StrokeThickness="2"
+                          StrokeLineCap="Round" StrokeLineJoin="Round" />
+                </Border>
+                <Label Grid.Column="1" Text="{Binding PageTitle}" FontSize="22" TextColor="{StaticResource TextDark}"
+                       HorizontalOptions="Center" VerticalOptions="Center" />
+            </Grid>
+
+            <!-- ============ RECOMMENDATION ============ -->
+            <Border StrokeThickness="1" Stroke="#E3DEFA" StrokeShape="RoundRectangle 14"
+                    BackgroundColor="{StaticResource AccentTint}" Padding="14">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                    <Border WidthRequest="32" HeightRequest="32" StrokeThickness="0" StrokeShape="RoundRectangle 16"
+                            BackgroundColor="{StaticResource Accent}" VerticalOptions="Center">
+                        <Path Data="M12 2 L15 8.5 L22 9.3 L16.8 14 L18.2 21 L12 17.5 L5.8 21 L7.2 14 L2 9.3 L9 8.5 Z"
+                              WidthRequest="16" HeightRequest="16" Aspect="Uniform"
+                              HorizontalOptions="Center" VerticalOptions="Center"
+                              Stroke="White" StrokeThickness="1.6" StrokeLineJoin="Round" />
+                    </Border>
+                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                        <Label Text="Recommended for you" FontFamily="OpenSansSemibold" FontSize="14"
+                               TextColor="{StaticResource TextDark}" />
+                        <Label Text="{Binding RecommendationText}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                    </VerticalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- ============ LEVEL SELECTOR ============ -->
+            <Border StrokeThickness="0" StrokeShape="RoundRectangle 14"
+                    BackgroundColor="{StaticResource AccentSoft}" Padding="4">
+                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="4">
+
+                    <Border Style="{StaticResource LevelPill}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsEasy}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource Accent}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectLevelCommand}" CommandParameter="Easy" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout HorizontalOptions="Center">
+                            <Label Text="Easy" Style="{StaticResource LevelLabel}">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsEasy}" Value="True">
+                                        <Setter Property="TextColor" Value="White" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                            <Ellipse Style="{StaticResource LevelDot}" IsVisible="{Binding IsEasyRecommended}">
+                                <Ellipse.Triggers>
+                                    <DataTrigger TargetType="Ellipse" Binding="{Binding IsEasy}" Value="True">
+                                        <Setter Property="Fill" Value="White" />
+                                    </DataTrigger>
+                                </Ellipse.Triggers>
+                            </Ellipse>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <Border Grid.Column="1" Style="{StaticResource LevelPill}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsIntermediate}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource Accent}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectLevelCommand}" CommandParameter="Intermediate" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout HorizontalOptions="Center">
+                            <Label Text="Intermediate" Style="{StaticResource LevelLabel}">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsIntermediate}" Value="True">
+                                        <Setter Property="TextColor" Value="White" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                            <Ellipse Style="{StaticResource LevelDot}" IsVisible="{Binding IsIntermediateRecommended}">
+                                <Ellipse.Triggers>
+                                    <DataTrigger TargetType="Ellipse" Binding="{Binding IsIntermediate}" Value="True">
+                                        <Setter Property="Fill" Value="White" />
+                                    </DataTrigger>
+                                </Ellipse.Triggers>
+                            </Ellipse>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <Border Grid.Column="2" Style="{StaticResource LevelPill}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsHard}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{StaticResource Accent}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectLevelCommand}" CommandParameter="Hard" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout HorizontalOptions="Center">
+                            <Label Text="Hard" Style="{StaticResource LevelLabel}">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsHard}" Value="True">
+                                        <Setter Property="TextColor" Value="White" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                            <Ellipse Style="{StaticResource LevelDot}" IsVisible="{Binding IsHardRecommended}">
+                                <Ellipse.Triggers>
+                                    <DataTrigger TargetType="Ellipse" Binding="{Binding IsHard}" Value="True">
+                                        <Setter Property="Fill" Value="White" />
+                                    </DataTrigger>
+                                </Ellipse.Triggers>
+                            </Ellipse>
+                        </HorizontalStackLayout>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- ============ HERO CARD ============ -->
+            <Border StrokeThickness="0" StrokeShape="RoundRectangle 20" Padding="20">
+                <Border.Background>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop x:Name="HeroStart" Color="{StaticResource Accent}" Offset="0" />
+                        <GradientStop x:Name="HeroEnd" Color="{StaticResource AccentDark}" Offset="1" />
+                    </LinearGradientBrush>
+                </Border.Background>
+                <Border.Shadow>
+                    <Shadow Brush="#5B3CDD" Opacity="0.25" Radius="14" Offset="0,6" />
+                </Border.Shadow>
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="{Binding HeroEyebrow}" FontSize="12" CharacterSpacing="1" TextColor="#D6CEFA" />
+                    <Label Text="{Binding HeroTitle}" FontFamily="OpenSansSemibold" FontSize="24" TextColor="White" />
+                    <HorizontalStackLayout Spacing="20">
+                        <HorizontalStackLayout Spacing="6">
+                            <Path Style="{StaticResource MetaIcon}"
+                                  Data="M12 2 A10 10 0 1 1 11.99 2 Z M12 6 V12 L16 14" />
+                            <Label Text="{Binding DurationText}" FontSize="13" TextColor="White" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                        <HorizontalStackLayout Spacing="6">
+                            <Path Style="{StaticResource MetaIcon}" Data="M4 6 H20 M4 12 H20 M4 18 H14" />
+                            <Label Text="{Binding MovesText}" FontSize="13" TextColor="White" VerticalOptions="Center" />
+                        </HorizontalStackLayout>
+                    </HorizontalStackLayout>
+                    <Border StrokeThickness="0" StrokeShape="RoundRectangle 12" BackgroundColor="White"
+                            HeightRequest="44" Margin="0,6,0,0">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnStartTapped" />
+                        </Border.GestureRecognizers>
+                        <Label Text="{Binding StartText}" FontFamily="OpenSansSemibold" FontSize="15"
+                               TextColor="{StaticResource AccentDark}"
+                               HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ============ MOVES ============ -->
+            <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                <Label Text="{Binding ListTitle}" FontFamily="OpenSansSemibold" FontSize="17"
+                       TextColor="{StaticResource TextDark}" VerticalOptions="Center" />
+                <Label Grid.Column="1" Text="{Binding ListHint}" FontSize="12"
+                       TextColor="{StaticResource TextMuted}" VerticalOptions="Center" />
+            </Grid>
+
+            <VerticalStackLayout BindableLayout.ItemsSource="{Binding Moves}" Spacing="10">
+                <BindableLayout.ItemTemplate>
+                    <DataTemplate x:DataType="vm:StretchMoveItem">
+                        <Border StrokeThickness="1" Stroke="{StaticResource CardStroke}" BackgroundColor="White"
+                                StrokeShape="RoundRectangle 14" Padding="14,12">
+                            <Border.Triggers>
+                                <DataTrigger TargetType="Border" Binding="{Binding IsFirst}" Value="True">
+                                    <Setter Property="Stroke" Value="#9C88EC" />
+                                    <Setter Property="BackgroundColor" Value="{StaticResource AccentTint}" />
+                                </DataTrigger>
+                            </Border.Triggers>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnMoveTapped" CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+                            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14">
+                                <Border WidthRequest="36" HeightRequest="36" StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 10" BackgroundColor="{StaticResource AccentSoft}"
+                                        VerticalOptions="Center">
+                                    <Border.Triggers>
+                                        <DataTrigger TargetType="Border" Binding="{Binding IsFirst}" Value="True">
+                                            <Setter Property="BackgroundColor" Value="{StaticResource Accent}" />
+                                        </DataTrigger>
+                                    </Border.Triggers>
+                                    <Label Text="{Binding Number}" FontFamily="OpenSansSemibold" FontSize="15"
+                                           TextColor="{StaticResource AccentDark}"
+                                           HorizontalOptions="Center" VerticalOptions="Center">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsFirst}" Value="True">
+                                                <Setter Property="TextColor" Value="White" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                </Border>
+                                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                                    <Label Text="{Binding Title}" FontFamily="OpenSansSemibold" FontSize="15"
+                                           TextColor="{StaticResource TextDark}" />
+                                    <Label Text="{Binding Focus}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                                </VerticalStackLayout>
+                                <Border Grid.Column="2" StrokeThickness="0" StrokeShape="RoundRectangle 10"
+                                        BackgroundColor="{StaticResource AccentSoft}" Padding="10,6"
+                                        VerticalOptions="Center">
+                                    <Label Text="{Binding AmountText}" FontFamily="OpenSansSemibold" FontSize="12"
+                                           TextColor="{StaticResource AccentDark}" />
+                                </Border>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </BindableLayout.ItemTemplate>
+            </VerticalStackLayout>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

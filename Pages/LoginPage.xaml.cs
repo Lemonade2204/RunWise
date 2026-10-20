@@ -16,18 +16,35 @@ public partial class LoginPage : ContentPage
 			?? throw new InvalidOperationException("SupabaseAuthService is not registered. Register it in MauiProgram.cs");
 	}
 
+	private void OnTogglePasswordTapped(object? sender, EventArgs e)
+	{
+		PasswordEntry.IsPassword = !PasswordEntry.IsPassword;
+		EyeIcon.Stroke = PasswordEntry.IsPassword ? Color.FromArgb("#6B7489") : Color.FromArgb("#4A6CF7");
+	}
+
 	private async void OnLoginClicked(object? sender, EventArgs e)
 	{
+		if (!LoginButton.IsEnabled) return;
+
 		ErrorLabel.IsVisible = false;
-		BusyIndicator.IsVisible = true;
-		BusyIndicator.IsRunning = true;
 
 		var email = EmailEntry.Text?.Trim() ?? string.Empty;
 		var password = PasswordEntry.Text ?? string.Empty;
+		if (email.Length == 0 || password.Length == 0)
+		{
+			ErrorLabel.Text = "Please enter your email and password";
+			ErrorLabel.IsVisible = true;
+			return;
+		}
+
+		LoginButton.IsEnabled = false;
+		BusyIndicator.IsVisible = true;
+		BusyIndicator.IsRunning = true;
 
 		var result = await _authService.SignInAsync(email, password);
 		BusyIndicator.IsRunning = false;
 		BusyIndicator.IsVisible = false;
+		LoginButton.IsEnabled = true;
 
 		if (result.Success)
 		{

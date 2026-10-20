@@ -147,51 +147,72 @@ namespace RunWise.ViewModels
                 {
                     list = new System.Collections.Generic.List<Exercise>
                     {
-                        new Exercise { Title = "Bodyweight Butterfly Stretch", Description = "30s", Tips = "Sit and bring soles together, gently press knees toward floor." },
-                        new Exercise { Title = "Bodyweight Squat", Description = "10 reps", Tips = "Feet shoulder-width, hinge hips back, keep chest up." },
-                        new Exercise { Title = "Forward Lunges", Description = "8 reps", Tips = "Step forward, lower until both knees ~90 degrees." },
-                        new Exercise { Title = "Calf Raises", Description = "15 reps", Tips = "Rise onto toes, control the descent." }
+                        new Exercise { Title = "Bodyweight Butterfly Stretch", Focus = "Inner thighs and hips", Description = "30s", Tips = "Sit and bring soles together, gently press knees toward floor." },
+                        new Exercise { Title = "Bodyweight Squat", Focus = "Quads, glutes and hips", Description = "10 reps", Tips = "Feet shoulder-width, hinge hips back, keep chest up." },
+                        new Exercise { Title = "Forward Lunges", Focus = "Quads and hip flexors, alternating", Description = "8 reps", Tips = "Step forward, lower until both knees ~90 degrees." },
+                        new Exercise { Title = "Calf Raises", Focus = "Calves and ankles", Description = "15 reps", Tips = "Rise onto toes, control the descent." }
                     };
                 }
                 else if (lvl == "intermediate")
                 {
                     list = new System.Collections.Generic.List<Exercise>
                     {
-                        new Exercise { Title = "Bodyweight Butterfly Stretch", Description = "30s", Tips = "Sit and bring soles together, gently press knees toward floor." },
-                        new Exercise { Title = "Half Kneeling Hip Hinge", Description = "8 reps", Tips = "From half-kneeling, hinge at hips to feel posterior chain activation." },
-                        new Exercise { Title = "Curtsy Lunges", Description = "8 reps", Tips = "Step one leg behind and across to target glutes." },
-                        new Exercise { Title = "Lateral Lunges", Description = "8 reps", Tips = "Step to the side and push hips back while keeping chest up." },
-                        new Exercise { Title = "Bodyweight Swing Lunge", Description = "8 reps", Tips = "Explosive alternating swing lunge for dynamic warmup." }
+                        new Exercise { Title = "Bodyweight Butterfly Stretch", Focus = "Inner thighs and hips", Description = "30s", Tips = "Sit and bring soles together, gently press knees toward floor." },
+                        new Exercise { Title = "Half Kneeling Hip Hinge", Focus = "Hamstrings and glutes", Description = "8 reps", Tips = "From half-kneeling, hinge at hips to feel posterior chain activation." },
+                        new Exercise { Title = "Curtsy Lunges", Focus = "Glutes and outer hips, alternating", Description = "8 reps", Tips = "Step one leg behind and across to target glutes." },
+                        new Exercise { Title = "Lateral Lunges", Focus = "Adductors and hips, each side", Description = "8 reps", Tips = "Step to the side and push hips back while keeping chest up." },
+                        new Exercise { Title = "Bodyweight Swing Lunge", Focus = "Hips and legs, alternating", Description = "8 reps", Tips = "Explosive alternating swing lunge for dynamic warmup." }
                     };
                 }
                 else // advanced
                 {
                     list = new System.Collections.Generic.List<Exercise>
                     {
-                        new Exercise { Title = "Bodyweight Butterfly Stretch", Description = "30s", Tips = "Sit and bring soles together, gently press knees toward floor." },
-                        new Exercise { Title = "Deadlift Bounces Stretch", Description = "10 reps", Tips = "Soft bouncy movements to wake up hamstrings and glutes." },
-                        new Exercise { Title = "Single Leg Romanian Deadlifts", Description = "8 each leg", Tips = "Slow hinge on single leg to load posterior chain." },
-                        new Exercise { Title = "Forward Lunge", Description = "10 reps  ", Tips = "Deep controlled forward lunges." },
-                        new Exercise { Title = "Jump Squats", Description = "10 reps", Tips = "Explosive plyometric squats; land softly." }
+                        new Exercise { Title = "Bodyweight Butterfly Stretch", Focus = "Inner thighs and hips", Description = "30s", Tips = "Sit and bring soles together, gently press knees toward floor." },
+                        new Exercise { Title = "Deadlift Bounces Stretch", Focus = "Hamstrings and glutes", Description = "10 reps", Tips = "Soft bouncy movements to wake up hamstrings and glutes." },
+                        new Exercise { Title = "Single Leg Romanian Deadlifts", Focus = "Hamstrings and balance, each leg", Description = "8 each leg", Tips = "Slow hinge on single leg to load posterior chain." },
+                        new Exercise { Title = "Forward Lunge", Focus = "Quads and hip flexors, alternating", Description = "10 reps  ", Tips = "Deep controlled forward lunges." },
+                        new Exercise { Title = "Jump Squats", Focus = "Quads, glutes and calves", Description = "10 reps", Tips = "Explosive plyometric squats; land softly." }
                     };
                 }
             }
             else
             {
-                
-                list = new System.Collections.Generic.List<Exercise>
+                // Post-run cool-down holds per level. "Ns each leg" holds switch sides halfway in the session.
+                var lvl = (level ?? SelectedLevel ?? "beginner").Trim().ToLowerInvariant();
+                if (lvl == "beginner" || lvl == "novice")
                 {
-                    new Exercise { Title = "Standing quad stretch left", Description = "30s", Tips = "Stand, pull heel to glutes and hold." },
-                    new Exercise { Title = "Standing quad stretch right", Description = "30s", Tips = "Stand, pull heel to glutes and hold." },
-                    new Exercise { Title = "Lunging Hip Flexor Stretch left", Description = "30s", Tips = "Kneel and push hips forward to stretch hip flexor." },
-                    new Exercise { Title = "Lunging Hip Flexor Stretch right", Description = "30s", Tips = "Kneel and push hips forward to stretch hip flexor." },
-                    new Exercise { Title = "Standing hamstring stretch", Description = "30s", Tips = "Extend leg and hinge at hips to stretch hamstring." },
-                    new Exercise { Title = "Calf stretch left", Description = "30s", Tips = "Press heel to floor with straight leg to feel calf stretch." },
-                    new Exercise { Title = "Calf stretch right", Description = "30s", Tips = "Press heel to floor with straight leg to feel calf stretch." },
-                    new Exercise { Title = "Forward bend", Description = "30s", Tips = "Hinge at hips and reach toward toes; keep knees soft." },
-                    new Exercise { Title = "Sitting hamstring stretch left", Description = "30s", Tips = "Sit and reach toward toes of extended leg." },
-                    new Exercise { Title = "Sitting hamstring stretch right", Description = "30s", Tips = "Sit and reach toward toes of extended leg." }
-                };
+                    list = new System.Collections.Generic.List<Exercise>
+                    {
+                        new Exercise { Title = "Standing Quad Stretch", Focus = "Quads and hip flexors", Description = "30s each leg", Tips = "Pull your heel toward your glutes, keep knees together and hips level." },
+                        new Exercise { Title = "Standing Calf Stretch", Focus = "Calves and Achilles", Description = "30s each leg", Tips = "Hands on a wall, back leg straight, press the back heel into the floor." },
+                        new Exercise { Title = "Standing Hamstring Stretch", Focus = "Hamstrings", Description = "30s each leg", Tips = "Heel on a low step, leg straight, hinge forward with a long spine." },
+                        new Exercise { Title = "Forward Fold", Focus = "Hamstrings and lower back", Description = "30s", Tips = "Soft knees, let your head and arms hang heavy. Breathe slowly." }
+                    };
+                }
+                else if (lvl == "intermediate")
+                {
+                    list = new System.Collections.Generic.List<Exercise>
+                    {
+                        new Exercise { Title = "Standing Quad Stretch", Focus = "Quads and hip flexors", Description = "30s each leg", Tips = "Pull your heel toward your glutes, keep knees together and hips level." },
+                        new Exercise { Title = "Kneeling Hip Flexor Stretch", Focus = "Hip flexors and quads", Description = "30s each leg", Tips = "Kneel in a lunge, tuck your pelvis and shift hips gently forward." },
+                        new Exercise { Title = "Figure-Four Stretch", Focus = "Glutes and outer hips", Description = "30s each leg", Tips = "Lie on your back, cross ankle over the opposite knee and pull the thigh in." },
+                        new Exercise { Title = "Seated Hamstring Stretch", Focus = "Hamstrings and calves", Description = "30s each leg", Tips = "Sit with one leg extended and reach toward your toes without rounding." },
+                        new Exercise { Title = "Standing Calf Stretch", Focus = "Calves and Achilles", Description = "30s each leg", Tips = "Hands on a wall, back leg straight, press the back heel into the floor." }
+                    };
+                }
+                else // advanced
+                {
+                    list = new System.Collections.Generic.List<Exercise>
+                    {
+                        new Exercise { Title = "Kneeling Hip Flexor Stretch", Focus = "Hip flexors and quads", Description = "45s each leg", Tips = "Kneel in a lunge, tuck your pelvis and shift hips gently forward." },
+                        new Exercise { Title = "Pigeon Pose", Focus = "Glutes and piriformis", Description = "45s each leg", Tips = "From all fours, bring one shin forward and sink your hips low and square." },
+                        new Exercise { Title = "Half Splits", Focus = "Hamstrings", Description = "45s each leg", Tips = "From a low lunge, shift hips back and straighten the front leg." },
+                        new Exercise { Title = "Downward Dog", Focus = "Calves and hamstrings", Description = "45s", Tips = "Hips high, pedal your heels toward the floor one at a time." },
+                        new Exercise { Title = "Supine Spinal Twist", Focus = "Lower back and outer hips", Description = "30s each side", Tips = "Lie on your back, drop bent knees to one side, keep shoulders down." },
+                        new Exercise { Title = "Child's Pose", Focus = "Lower back and hips", Description = "60s", Tips = "Knees wide, sit back on your heels, arms long. Slow, deep breaths." }
+                    };
+                }
             }
 
       

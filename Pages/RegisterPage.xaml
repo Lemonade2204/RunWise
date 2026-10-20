@@ -1,44 +1,141 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:RunWise.Controls"
              x:Class="RunWise.Pages.RegisterPage"
-             Title="Register"
+             NavigationPage.HasNavigationBar="False"
+             Shell.NavBarIsVisible="False"
              BackgroundColor="White">
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Color x:Key="Primary">#4A6CF7</Color>
+            <Color x:Key="TextDark">#1B2237</Color>
+            <Color x:Key="TextMuted">#6B7489</Color>
+            <Color x:Key="FieldBackground">#F4F6FB</Color>
+            <Color x:Key="CardStroke">#E6EAF3</Color>
+
+            <Style x:Key="FieldLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="TextColor" Value="{StaticResource TextDark}" />
+                <Setter Property="Margin" Value="0,8,0,0" />
+            </Style>
+
+            <Style x:Key="Field" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource FieldBackground}" />
+                <Setter Property="Stroke" Value="{StaticResource CardStroke}" />
+                <Setter Property="StrokeThickness" Value="1" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 14" />
+                <Setter Property="Padding" Value="14,0" />
+                <Setter Property="HeightRequest" Value="50" />
+            </Style>
+
+            <Style x:Key="FieldEntry" TargetType="controls:BorderlessEntry">
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="TextColor" Value="{StaticResource TextDark}" />
+                <Setter Property="PlaceholderColor" Value="#A3AABB" />
+                <Setter Property="FontSize" Value="15" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <ScrollView>
-        <VerticalStackLayout Padding="30" Spacing="16" VerticalOptions="Center">
+        <Grid RowDefinitions="Auto,*">
 
-            <Label Text="Create account"
-                   FontSize="28"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Center"
-                   Margin="0,0,0,20" />
+            <!-- Blue header -->
+            <Grid BackgroundColor="{StaticResource Primary}" Padding="20,20,20,64" RowDefinitions="Auto,Auto" RowSpacing="28">
+                <Grid ColumnDefinitions="Auto,*">
+                    <Border WidthRequest="42" HeightRequest="42" BackgroundColor="#33FFFFFF" StrokeThickness="0" StrokeShape="RoundRectangle 12">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnBackTapped" />
+                        </Border.GestureRecognizers>
+                        <Path Data="M16 10 H4 M9 5 L4 10 L9 15" WidthRequest="20" HeightRequest="20" Aspect="None"
+                              HorizontalOptions="Center" VerticalOptions="Center"
+                              Stroke="White" StrokeThickness="2" StrokeLineCap="Round" StrokeLineJoin="Round" />
+                    </Border>
+                    <Label Grid.Column="1" Text="RUNWISE" TextColor="White" FontSize="14" FontAttributes="Bold" CharacterSpacing="3"
+                           HorizontalOptions="End" VerticalOptions="Center" />
+                </Grid>
+                <Label Grid.Row="1" Text="Let's get you&#10;running." TextColor="White" FontSize="30" FontAttributes="Bold" LineHeight="1.1" />
+            </Grid>
 
-            <Entry x:Name="EmailEntry"
-                   Placeholder="Email"
-                   Keyboard="Email" />
+            <!-- White form sheet overlapping the header -->
+            <Border Grid.Row="1" BackgroundColor="White" StrokeThickness="0" StrokeShape="RoundRectangle 28,28,0,0"
+                    Margin="0,-32,0,0" Padding="20,28,20,32">
+                <VerticalStackLayout Spacing="6">
 
-            <Entry x:Name="PasswordEntry"
-                   Placeholder="Password"
-                   IsPassword="True" />
+                    <Label Text="Create account" FontSize="22" FontAttributes="Bold" TextColor="{StaticResource TextDark}" />
+                    <Label Text="It takes less than a minute." FontSize="13" TextColor="{StaticResource TextMuted}" Margin="0,0,0,6" />
 
-            <Entry x:Name="ConfirmEntry"
-                   Placeholder="Confirm password"
-                   IsPassword="True" />
+                    <Label Text="Full name" Style="{StaticResource FieldLabel}" />
+                    <Border Style="{StaticResource Field}">
+                        <controls:BorderlessEntry x:Name="NameEntry" Style="{StaticResource FieldEntry}" Keyboard="Text" />
+                    </Border>
 
-            <Label x:Name="ErrorLabel"
-                   TextColor="Red"
-                   FontSize="13"
-                   IsVisible="False" />
+                    <Label Text="Email address" Style="{StaticResource FieldLabel}" />
+                    <Border Style="{StaticResource Field}">
+                        <controls:BorderlessEntry x:Name="EmailEntry" Style="{StaticResource FieldEntry}" Keyboard="Email" />
+                    </Border>
 
-            <Button Text="Register"
-                    Clicked="OnRegisterClicked"
-                    Margin="0,10,0,0" />
+                    <Label Text="Password" Style="{StaticResource FieldLabel}" />
+                    <Border Style="{StaticResource Field}">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <controls:BorderlessEntry x:Name="PasswordEntry" Style="{StaticResource FieldEntry}" IsPassword="True" />
+                            <Grid Grid.Column="1" WidthRequest="36" HeightRequest="36" VerticalOptions="Center">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnTogglePasswordTapped" />
+                                </Grid.GestureRecognizers>
+                                <Path x:Name="EyeIcon" WidthRequest="20" HeightRequest="20" Aspect="Uniform"
+                                      HorizontalOptions="Center" VerticalOptions="Center"
+                                      Stroke="{StaticResource TextMuted}" StrokeThickness="1.6" StrokeLineCap="Round" StrokeLineJoin="Round"
+                                      Data="M2 12 C5 6 9 4 12 4 C15 4 19 6 22 12 C19 18 15 20 12 20 C9 20 5 18 2 12 Z M12 9 A3 3 0 1 0 12 15 A3 3 0 1 0 12 9" />
+                            </Grid>
+                        </Grid>
+                    </Border>
 
-            <ActivityIndicator x:Name="BusyIndicator"
-                               IsVisible="False"
-                               IsRunning="False" />
+                    <Label Text="Confirm password" Style="{StaticResource FieldLabel}" />
+                    <Border Style="{StaticResource Field}">
+                        <controls:BorderlessEntry x:Name="ConfirmEntry" Style="{StaticResource FieldEntry}" IsPassword="True" />
+                    </Border>
 
-        </VerticalStackLayout>
+                    <HorizontalStackLayout Spacing="4" Margin="-6,10,0,0">
+                        <CheckBox x:Name="TermsCheckBox" Color="{StaticResource Primary}" VerticalOptions="Center" />
+                        <Label VerticalOptions="Center" FontSize="13" TextColor="{StaticResource TextMuted}">
+                            <Label.FormattedText>
+                                <FormattedString>
+                                    <Span Text="I agree to the " />
+                                    <Span Text="Terms of Service" TextColor="{StaticResource Primary}" FontAttributes="Bold" />
+                                    <Span Text=" and " />
+                                    <Span Text="Privacy Policy" TextColor="{StaticResource Primary}" FontAttributes="Bold" />
+                                </FormattedString>
+                            </Label.FormattedText>
+                        </Label>
+                    </HorizontalStackLayout>
+
+                    <Label x:Name="ErrorLabel" TextColor="#E5484D" FontSize="13" IsVisible="False" />
+
+                    <Button x:Name="CreateButton" Text="Create account" Clicked="OnRegisterClicked"
+                            BackgroundColor="{StaticResource Primary}" TextColor="White" FontAttributes="Bold" FontSize="16"
+                            CornerRadius="16" HeightRequest="54" Margin="0,10,0,0">
+                        <Button.Shadow>
+                            <Shadow Brush="#4A6CF7" Opacity="0.35" Radius="14" Offset="0,6" />
+                        </Button.Shadow>
+                    </Button>
+
+                    <ActivityIndicator x:Name="BusyIndicator" IsVisible="False" IsRunning="False" Color="{StaticResource Primary}" />
+
+                    <HorizontalStackLayout HorizontalOptions="Center" Spacing="4" Margin="0,14,0,0">
+                        <Label Text="Already have an account?" FontSize="14" TextColor="{StaticResource TextMuted}" />
+                        <Label Text="Login" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource Primary}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnBackTapped" />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </HorizontalStackLayout>
+
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
     </ScrollView>
 </ContentPage>

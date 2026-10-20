@@ -77,7 +77,7 @@ public class SupabaseDatabaseService
             food_name = meal.Name,
             calories = meal.Calories,
             servings = meal.Quantity,
-            serving_size = (string?)null,
+            serving_size = meal.Notes,
             meal_type = meal.Type.ToString().ToLowerInvariant(),
             meal_date = meal.Date.ToString("yyyy-MM-dd"),
             created_at = DateTime.UtcNow
@@ -111,7 +111,7 @@ public class SupabaseDatabaseService
             food_name = meal.Name,
             calories = meal.Calories,
             servings = meal.Quantity,
-            serving_size = (string?)null,
+            serving_size = meal.Notes,
             meal_type = meal.Type.ToString().ToLowerInvariant(),
             meal_date = meal.Date.ToString("yyyy-MM-dd")
         };

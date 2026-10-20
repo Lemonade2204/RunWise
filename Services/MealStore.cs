@@ -80,8 +80,13 @@ namespace RunWise.Services
             await SaveMealsForDateAsync(meal.Date.Date, list);
         }
 
-        public async Task UpdateMealAsync(MealItem meal)
+        // Returns an error message when the server could not be updated, otherwise null.
+        public async Task<string?> UpdateMealAsync(MealItem meal)
         {
+            // Update the server first: when signed in, meals are read back from Supabase
+            var error = await SyncToServerAsync(sup => sup.UpdateMealAsync(meal));
+            if (error != null) return error;
+
             var list = await GetMealsForDateAsync(meal.Date.Date);
             var idx = list.FindIndex(m => m.Id == meal.Id);
             if (idx >= 0)
@@ -89,16 +94,45 @@ namespace RunWise.Services
                 list[idx] = meal;
                 await SaveMealsForDateAsync(meal.Date.Date, list);
             }
+            return null;
         }
 
-        public async Task DeleteMealAsync(MealItem meal)
+        // Returns an error message when the server could not be updated, otherwise null.
+        public async Task<string?> DeleteMealAsync(MealItem meal)
         {
+            // Delete on the server first, otherwise the meal comes back on the next load
+            var error = await SyncToServerAsync(sup => sup.DeleteMealAsync(meal));
+            if (error != null) return error;
+
             var list = await GetMealsForDateAsync(meal.Date.Date);
             var idx = list.FindIndex(m => m.Id == meal.Id);
             if (idx >= 0)
             {
                 list.RemoveAt(idx);
                 await SaveMealsForDateAsync(meal.Date.Date, list);
+            }
+            else
+            {
+                MealsChanged?.Invoke();
+            }
+            return null;
+        }
+
+        private static async Task<string?> SyncToServerAsync(Func<SupabaseDatabaseService, Task<(bool Success, string? Error)>> action)
+        {
+            try
+            {
+                var auth = MauiProgram.Services.GetService(typeof(SupabaseAuthService)) as SupabaseAuthService;
+                var sup = MauiProgram.Services.GetService(typeof(SupabaseDatabaseService)) as SupabaseDatabaseService;
+                // signed out: local storage only
+                if (sup == null || string.IsNullOrEmpty(auth?.UserId)) return null;
+
+                var (ok, err) = await action(sup);
+                return ok ? null : err ?? "Server sync failed";
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
             }
         }
 

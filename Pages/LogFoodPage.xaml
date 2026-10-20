@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:RunWise.ViewModels"
+             xmlns:controls="clr-namespace:RunWise.Controls"
+             x:Class="RunWise.Pages.LogFoodPage"
+             x:DataType="vm:LogFoodViewModel"
+             Shell.NavBarIsVisible="False"
+             Shell.PresentationMode="ModalAnimated"
+             BackgroundColor="#661B2237">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Color x:Key="Primary">#4A6CF7</Color>
+            <Color x:Key="PrimarySoft">#E8EDFF</Color>
+            <Color x:Key="TextDark">#1B2237</Color>
+            <Color x:Key="TextMuted">#9AA3B5</Color>
+            <Color x:Key="FieldBackground">#F6F8FC</Color>
+            <Color x:Key="CardStroke">#E6EAF3</Color>
+
+            <Style x:Key="FieldLabel" TargetType="Label">
+                <Setter Property="FontSize" Value="13" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="TextColor" Value="{StaticResource TextDark}" />
+                <Setter Property="Margin" Value="0,4,0,0" />
+            </Style>
+
+            <Style x:Key="Field" TargetType="Border">
+                <Setter Property="BackgroundColor" Value="{StaticResource FieldBackground}" />
+                <Setter Property="Stroke" Value="{StaticResource CardStroke}" />
+                <Setter Property="StrokeThickness" Value="1" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+                <Setter Property="Padding" Value="12,0" />
+                <Setter Property="HeightRequest" Value="48" />
+            </Style>
+
+            <Style x:Key="FieldEntry" TargetType="controls:BorderlessEntry">
+                <Setter Property="BackgroundColor" Value="Transparent" />
+                <Setter Property="TextColor" Value="{StaticResource TextDark}" />
+                <Setter Property="PlaceholderColor" Value="{StaticResource TextMuted}" />
+                <Setter Property="FontSize" Value="15" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+
+            <Style x:Key="StepperButton" TargetType="Border">
+                <Setter Property="WidthRequest" Value="38" />
+                <Setter Property="HeightRequest" Value="38" />
+                <Setter Property="BackgroundColor" Value="White" />
+                <Setter Property="Stroke" Value="{StaticResource CardStroke}" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 19" />
+            </Style>
+
+            <!-- Food card used by Search foods and Recommended food -->
+            <DataTemplate x:Key="FoodCardTemplate" x:DataType="vm:FoodOption">
+                <Border BackgroundColor="White" Stroke="{StaticResource CardStroke}" StrokeThickness="1"
+                        StrokeShape="RoundRectangle 14" Padding="14,12">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                        <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                            <HorizontalStackLayout Spacing="6">
+                                <Label Text="{Binding Title}" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextDark}"
+                                       LineBreakMode="TailTruncation" MaximumWidthRequest="210" />
+                                <Border IsVisible="{Binding IsMine}" BackgroundColor="{StaticResource PrimarySoft}" StrokeThickness="0"
+                                        StrokeShape="RoundRectangle 6" Padding="5,1" VerticalOptions="Center">
+                                    <Label Text="MINE" FontSize="9" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                                </Border>
+                            </HorizontalStackLayout>
+                            <Label Text="{Binding ServingText}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                            <Label Text="{Binding Reason}" IsVisible="{Binding HasReason}" FontSize="12" TextColor="{StaticResource TextDark}"
+                                   Margin="0,2,0,0" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="6" HorizontalOptions="End">
+                            <Label Text="{Binding CaloriesText}" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextDark}"
+                                   HorizontalOptions="End" />
+                            <Button Text="Add" Clicked="OnAddFoodClicked" BackgroundColor="{StaticResource Primary}" TextColor="White"
+                                    FontAttributes="Bold" FontSize="13" CornerRadius="10" HeightRequest="36" Padding="16,0"
+                                    HorizontalOptions="End" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </Border>
+            </DataTemplate>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="40,*">
+        <!-- Dimmed area above the sheet closes it -->
+        <BoxView Color="Transparent">
+            <BoxView.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnCloseTapped" />
+            </BoxView.GestureRecognizers>
+        </BoxView>
+
+        <Border Grid.Row="1" BackgroundColor="White" StrokeThickness="0" StrokeShape="RoundRectangle 24,24,0,0" Padding="0">
+            <Grid RowDefinitions="Auto,*">
+
+                <!-- Header -->
+                <Grid ColumnDefinitions="*,Auto" Padding="20,18,20,8">
+                    <Label Text="Log food" FontSize="24" FontAttributes="Bold" TextColor="{StaticResource TextDark}" VerticalOptions="Center" />
+                    <Border Grid.Column="1" WidthRequest="40" HeightRequest="40" BackgroundColor="#F3F5FA"
+                            StrokeThickness="0" StrokeShape="RoundRectangle 20">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnCloseTapped" />
+                        </Border.GestureRecognizers>
+                        <Path Data="M6 6 L14 14 M14 6 L6 14" WidthRequest="20" HeightRequest="20" Aspect="None"
+                              HorizontalOptions="Center" VerticalOptions="Center"
+                              Stroke="{StaticResource TextDark}" StrokeThickness="2" StrokeLineCap="Round" />
+                    </Border>
+                </Grid>
+
+                <ScrollView Grid.Row="1">
+                    <VerticalStackLayout Padding="20,4,20,28" Spacing="10">
+
+                        <!-- Date -->
+                        <Label Text="Date" Style="{StaticResource FieldLabel}" />
+                        <Border Style="{StaticResource Field}">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <DatePicker Date="{Binding Date, Mode=TwoWay}" Format="MM/dd/yyyy" TextColor="{StaticResource TextDark}"
+                                            FontSize="15" BackgroundColor="Transparent" VerticalOptions="Center" />
+                                <Path Grid.Column="1" WidthRequest="18" HeightRequest="18" Aspect="Uniform" VerticalOptions="Center" InputTransparent="True"
+                                      Stroke="{StaticResource TextDark}" StrokeThickness="1.6" StrokeLineCap="Round" StrokeLineJoin="Round"
+                                      Data="M4 6 A2 2 0 0 1 6 4 H18 A2 2 0 0 1 20 6 V19 A2 2 0 0 1 18 21 H6 A2 2 0 0 1 4 19 Z M4 10 H20 M8 2 V6 M16 2 V6" />
+                            </Grid>
+                        </Border>
+                        <Label Text="{Binding Date, StringFormat='{0:dddd}'}" FontSize="12" TextColor="{StaticResource TextMuted}" Margin="2,-4,0,0" />
+
+                        <!-- Meal -->
+                        <Label Text="Meal" Style="{StaticResource FieldLabel}" />
+                        <CollectionView ItemsSource="{Binding MealChoices}" SelectionMode="None" HeightRequest="46">
+                            <CollectionView.ItemsLayout>
+                                <GridItemsLayout Orientation="Vertical" Span="4" HorizontalItemSpacing="8" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="vm:MealChoice">
+                                    <Border BackgroundColor="{Binding Background}" Stroke="{Binding Stroke}" StrokeThickness="1"
+                                            StrokeShape="RoundRectangle 12" HeightRequest="44">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnMealChoiceTapped" CommandParameter="{Binding .}" />
+                                        </Border.GestureRecognizers>
+                                        <Label Text="{Binding Label}" FontSize="13" FontAttributes="Bold" TextColor="{Binding TextColor}"
+                                               HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </Border>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+
+                        <!-- Search / recommended / own food toggle -->
+                        <Border BackgroundColor="#EEF1F8" StrokeThickness="0" StrokeShape="RoundRectangle 14" Padding="4" Margin="0,6,0,0">
+                            <Grid ColumnDefinitions="*,*,*" ColumnSpacing="4">
+                                <Border BackgroundColor="{Binding SearchTabBackground}" StrokeThickness="0" StrokeShape="RoundRectangle 11" HeightRequest="40">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding ShowSearchCommand}" />
+                                    </Border.GestureRecognizers>
+                                    <Label Text="Search foods" FontSize="13" FontAttributes="Bold" TextColor="{Binding SearchTabText}"
+                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                                <Border Grid.Column="1" BackgroundColor="{Binding RecommendedTabBackground}" StrokeThickness="0" StrokeShape="RoundRectangle 11" HeightRequest="40">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding ShowRecommendedCommand}" />
+                                    </Border.GestureRecognizers>
+                                    <Label Text="Recommended food" FontSize="13" FontAttributes="Bold" TextColor="{Binding RecommendedTabText}"
+                                           HorizontalOptions="Center" VerticalOptions="Center" HorizontalTextAlignment="Center" />
+                                </Border>
+                                <Border Grid.Column="2" BackgroundColor="{Binding OwnTabBackground}" StrokeThickness="0" StrokeShape="RoundRectangle 11" HeightRequest="40">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding ShowOwnCommand}" />
+                                    </Border.GestureRecognizers>
+                                    <Label Text="My own food" FontSize="13" FontAttributes="Bold" TextColor="{Binding OwnTabText}"
+                                           HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <!-- Added confirmation -->
+                        <Border IsVisible="{Binding HasStatus}" BackgroundColor="{StaticResource PrimarySoft}" StrokeThickness="0"
+                                StrokeShape="RoundRectangle 12" Padding="12,10">
+                            <Label Text="{Binding StatusMessage, StringFormat='✓  {0}'}" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+                        </Border>
+
+                        <!-- ============ SEARCH FOODS ============ -->
+                        <VerticalStackLayout IsVisible="{Binding IsSearchMode}" Spacing="10">
+                            <Label Text="Search a food" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource Field}">
+                                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                    <Path WidthRequest="18" HeightRequest="18" Aspect="Uniform" VerticalOptions="Center"
+                                          Stroke="{StaticResource TextMuted}" StrokeThickness="1.8" StrokeLineCap="Round"
+                                          Data="M11 4 A7 7 0 1 0 11 18 A7 7 0 1 0 11 4 M16 16 L20 20" />
+                                    <controls:BorderlessEntry Grid.Column="1" Style="{StaticResource FieldEntry}"
+                                                              Text="{Binding SearchText}" Placeholder="Try adobo, pandesal, banana"
+                                                              ReturnType="Search" ClearButtonVisibility="WhileEditing" />
+                                </Grid>
+                            </Border>
+
+                            <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="12" Margin="0,4,0,0">
+                                <Label Text="Servings to add" FontSize="13" FontAttributes="Bold" TextColor="{StaticResource TextDark}" VerticalOptions="Center" />
+                                <Border Grid.Column="1" Style="{StaticResource StepperButton}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding DecrementServingsCommand}" />
+                                    </Border.GestureRecognizers>
+                                    <Label Text="−" FontSize="18" TextColor="{StaticResource TextDark}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                                <Label Grid.Column="2" Text="{Binding Servings}" FontSize="16" FontAttributes="Bold" TextColor="{StaticResource TextDark}"
+                                       WidthRequest="24" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                                <Border Grid.Column="3" Style="{StaticResource StepperButton}">
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding IncrementServingsCommand}" />
+                                    </Border.GestureRecognizers>
+                                    <Label Text="+" FontSize="18" TextColor="{StaticResource TextDark}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                </Border>
+                            </Grid>
+
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,6,0,0">
+                                <Label Text="{Binding ListTitle}" Style="{StaticResource FieldLabel}" Margin="0" VerticalOptions="Center" />
+                                <ActivityIndicator Grid.Column="1" IsRunning="{Binding IsSearching}" IsVisible="{Binding IsSearching}"
+                                                   Color="{StaticResource Primary}" HeightRequest="18" WidthRequest="18" />
+                            </Grid>
+
+                            <Label Text="{Binding EmptyMessage}" IsVisible="{Binding HasEmptyMessage}" FontSize="13" TextColor="{StaticResource TextMuted}" />
+
+                            <VerticalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding Foods}"
+                                                 BindableLayout.ItemTemplate="{StaticResource FoodCardTemplate}" />
+                        </VerticalStackLayout>
+
+                        <!-- ============ RECOMMENDED FOOD ============ -->
+                        <VerticalStackLayout IsVisible="{Binding IsRecommendedMode}" Spacing="10">
+                            <Border BackgroundColor="{StaticResource FieldBackground}" Stroke="{StaticResource CardStroke}" StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 14" Padding="14,12">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                    <VerticalStackLayout Spacing="4" VerticalOptions="Center">
+                                        <Label Text="Based on your run" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                                        <Label Text="{Binding RunSummary}" FontSize="14" FontAttributes="Bold" TextColor="{StaticResource TextDark}" />
+                                        <Label Text="{Binding RunTargetText}" IsVisible="{Binding HasRunTarget}" FontSize="12" TextColor="{StaticResource Primary}" />
+                                    </VerticalStackLayout>
+                                    <Border Grid.Column="1" Style="{StaticResource StepperButton}" VerticalOptions="Center">
+                                        <Border.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding RefreshRecommendationsCommand}" />
+                                        </Border.GestureRecognizers>
+                                        <Label Text="↻" FontSize="18" TextColor="{StaticResource TextDark}" HorizontalOptions="Center" VerticalOptions="Center" />
+                                    </Border>
+                                </Grid>
+                            </Border>
+
+                            <ActivityIndicator IsRunning="{Binding IsRecommending}" IsVisible="{Binding IsRecommending}"
+                                               Color="{StaticResource Primary}" HeightRequest="24" WidthRequest="24" />
+
+                            <Label Text="{Binding RecommendMessage}" IsVisible="{Binding HasRecommendMessage}" FontSize="13" TextColor="{StaticResource TextMuted}" />
+
+                            <VerticalStackLayout Spacing="10" BindableLayout.ItemsSource="{Binding RunFoods}"
+                                                 BindableLayout.ItemTemplate="{StaticResource FoodCardTemplate}" />
+
+                            <Label Text="Suggestions are made by AI and calories are estimates. Use &quot;My own food&quot; if you know the exact value."
+                                   FontSize="11" TextColor="{StaticResource TextMuted}" Margin="0,4,0,0" />
+                        </VerticalStackLayout>
+
+                        <!-- ============ MY OWN FOOD ============ -->
+                        <VerticalStackLayout IsVisible="{Binding IsOwnMode}" Spacing="10">
+                            <Label Text="Meal name" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource Field}">
+                                <controls:BorderlessEntry Style="{StaticResource FieldEntry}" Text="{Binding OwnName}"
+                                                          Placeholder="e.g. Mom's chicken adobo" />
+                            </Border>
+
+                            <Label Text="Calories" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource Field}">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <controls:BorderlessEntry Style="{StaticResource FieldEntry}" Text="{Binding OwnCalories}"
+                                                              Placeholder="e.g. 450" Keyboard="Numeric" />
+                                    <Label Grid.Column="1" Text="kcal" FontSize="13" TextColor="{StaticResource TextMuted}" VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+
+                            <Label Text="Serving (optional)" Style="{StaticResource FieldLabel}" />
+                            <Border Style="{StaticResource Field}">
+                                <controls:BorderlessEntry Style="{StaticResource FieldEntry}" Text="{Binding OwnServing}"
+                                                          Placeholder="e.g. 1 bowl" />
+                            </Border>
+
+                            <HorizontalStackLayout Spacing="4" Margin="0,2,0,0">
+                                <CheckBox IsChecked="{Binding SaveToMyFoods}" Color="{StaticResource Primary}" VerticalOptions="Center" />
+                                <Label Text="Save to My foods so I can search for it again" FontSize="13" TextColor="{StaticResource TextDark}"
+                                       VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+
+                            <Button Text="{Binding AddOwnButtonText}" Clicked="OnAddOwnClicked" BackgroundColor="{StaticResource Primary}"
+                                    TextColor="White" FontAttributes="Bold" FontSize="15" CornerRadius="14" HeightRequest="50">
+                                <Button.Shadow>
+                                    <Shadow Brush="#4A6CF7" Opacity="0.3" Radius="12" Offset="0,4" />
+                                </Button.Shadow>
+                            </Button>
+                        </VerticalStackLayout>
+
+                    </VerticalStackLayout>
+                </ScrollView>
+            </Grid>
+        </Border>
+    </Grid>
+</ContentPage>

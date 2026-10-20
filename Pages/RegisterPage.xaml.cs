@@ -15,24 +15,46 @@ public partial class RegisterPage : ContentPage
             ?? throw new InvalidOperationException("SupabaseAuthService is not registered. Register it in MauiProgram.cs");
     }
 
+    private async void OnBackTapped(object? sender, EventArgs e)
+    {
+        try { await Navigation.PopAsync(); } catch { }
+    }
+
+    // Shows or hides both password fields together
+    private void OnTogglePasswordTapped(object? sender, EventArgs e)
+    {
+        var hide = !PasswordEntry.IsPassword;
+        PasswordEntry.IsPassword = hide;
+        ConfirmEntry.IsPassword = hide;
+        EyeIcon.Stroke = hide ? Color.FromArgb("#6B7489") : Color.FromArgb("#4A6CF7");
+    }
+
+    private void ShowError(string message)
+    {
+        ErrorLabel.Text = message;
+        ErrorLabel.IsVisible = true;
+    }
+
     private async void OnRegisterClicked(object? sender, EventArgs e)
     {
         ErrorLabel.IsVisible = false;
+
+        var fullName = NameEntry.Text?.Trim() ?? string.Empty;
+        var email = EmailEntry.Text?.Trim() ?? string.Empty;
+        var password = PasswordEntry.Text ?? string.Empty;
+        var confirm = ConfirmEntry.Text ?? string.Empty;
+
+        if (fullName.Length == 0) { ShowError("Please enter your full name"); return; }
+        if (email.Length == 0) { ShowError("Please enter your email address"); return; }
+        if (password != confirm) { ShowError("Passwords do not match"); return; }
+        if (!TermsCheckBox.IsChecked) { ShowError("Please agree to the Terms of Service and Privacy Policy"); return; }
+
+        CreateButton.IsEnabled = false;
         BusyIndicator.IsVisible = true;
         BusyIndicator.IsRunning = true;
 
         try
         {
-            var email = EmailEntry.Text?.Trim() ?? string.Empty;
-            var password = PasswordEntry.Text ?? string.Empty;
-            var confirm = ConfirmEntry.Text ?? string.Empty;
-
-            if (password != confirm)
-            {
-                ErrorLabel.Text = "Passwords do not match";
-                ErrorLabel.IsVisible = true;
-                return;
-            }
 
             var result = await _authService.SignUpAsync(email, password);
 
@@ -41,7 +63,7 @@ public partial class RegisterPage : ContentPage
                 // Try to create the profile row in Supabase (non-fatal)
                 try
                 {
-                    var (ok, err) = await _authService.CreateProfileAsync(email, null);
+                    var (ok, err) = await _authService.CreateProfileAsync(email, fullName);
                     if (!ok)
                     {
                         // non-fatal: show message but still return to login
@@ -79,6 +101,7 @@ public partial class RegisterPage : ContentPage
         }
         finally
         {
+            CreateButton.IsEnabled = true;
             BusyIndicator.IsRunning = false;
             BusyIndicator.IsVisible = false;
         }

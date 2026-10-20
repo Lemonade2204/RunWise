@@ -20,67 +20,14 @@ namespace RunWise.Pages
             }
         }
 
-    private async void OnStartPreRunClicked(object? sender, EventArgs e)
+    private async void OnStartPreRunClicked(object? sender, TappedEventArgs e)
     {
-        var choice = await DisplayActionSheet("Select level", "Cancel", null, "Beginner", "Intermediate", "Advanced");
-        if (string.IsNullOrEmpty(choice) || choice == "Cancel")
-            return;
-        // Map UI labels to API level values expected by MuscleWiki
-        var level = choice switch
-        {
-            "Beginner" => "beginner",
-            "Intermediate" => "intermediate",
-            "Advanced" => "advance",
-            _ => "beginner",
-        };
-
-        // show simple loading indicator
-        try
-        {
-            // Use local routine generator instead of external API
-            if (BindingContext is RunWise.ViewModels.ExercisesViewModel vm)
-            {
-                var list = await vm.CreateRoutineAsync("pre", level).ConfigureAwait(false);
-                await MainThread.InvokeOnMainThreadAsync(async () =>
-                {
-                    if (list == null || list.Count == 0)
-                    {
-                        return;
-                    }
-
-                    await Navigation.PushAsync(new WorkoutPage(list, $"{choice} Pre-workout"));
-                });
-            }
-        }
-        catch (Exception ex)
-        {
-            await DisplayAlert("Error", $"Failed to create routine: {ex.Message}", "OK");
-        }
+        await Navigation.PushAsync(new StretchRoutinePage(RunWise.ViewModels.StretchKind.PreRun));
     }
 
-    private async void OnStartPostRunClicked(object? sender, EventArgs e)
+    private async void OnStartPostRunClicked(object? sender, TappedEventArgs e)
     {
-        // Immediately generate a post-workout routine (no level selection)
-        try
-        {
-            if (BindingContext is RunWise.ViewModels.ExercisesViewModel vm)
-            {
-                var list = await vm.CreateRoutineAsync("post", null).ConfigureAwait(false);
-                await MainThread.InvokeOnMainThreadAsync(async () =>
-                {
-                    if (list == null || list.Count == 0)
-                    {
-                        return;
-                    }
-
-                    await Navigation.PushAsync(new WorkoutPage(list, "Post-workout"));
-                });
-            }
-        }
-        catch (Exception ex)
-        {
-           
-        }
+        await Navigation.PushAsync(new StretchRoutinePage(RunWise.ViewModels.StretchKind.PostRun));
     }
 
     private async void OnStartExerciseClicked(object? sender, EventArgs e)

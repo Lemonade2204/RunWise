@@ -1,4 +1,5 @@
 using Microsoft.Maui.Controls;
+using RunWise.Models;
 using RunWise.ViewModels;
 
 namespace RunWise.Pages;
@@ -46,23 +47,21 @@ public partial class MealPlannerPage : ContentPage
     private async void OnAddItemClicked(object? sender, EventArgs e)
     {
         if (sender is BindableObject b && b.BindingContext is MealSection section)
-            await GoToFoodAsync(section.Type.ToString());
+            await OpenLogFoodAsync(section.Type);
     }
 
-    private async void OnLogFoodClicked(object? sender, EventArgs e) => await GoToFoodAsync(null);
+    private async void OnLogFoodClicked(object? sender, EventArgs e) => await OpenLogFoodAsync(LogFoodPage.MealForNow());
 
-    private async Task GoToFoodAsync(string? meal)
+    private async Task OpenLogFoodAsync(MealType meal)
     {
         try
         {
-            var date = (Vm?.SelectedDate ?? DateTime.Today).ToString("yyyy-MM-dd");
-            var route = $"//food?date={date}";
-            if (!string.IsNullOrEmpty(meal)) route += $"&meal={meal}";
-            await Shell.Current.GoToAsync(route);
+            var date = Vm?.SelectedDate ?? DateTime.Today;
+            await Navigation.PushModalAsync(new LogFoodPage(date, meal, () => Vm?.RefreshAsync() ?? Task.CompletedTask));
         }
         catch (Exception ex)
         {
-            await DisplayAlertAsync("Navigation error", ex.Message, "OK");
+            await DisplayAlertAsync("Couldn't open Log food", ex.Message, "OK");
         }
     }
 
@@ -70,7 +69,9 @@ public partial class MealPlannerPage : ContentPage
     {
         if (e.Parameter is not MealRow row || Vm == null) return;
         var ok = await DisplayAlertAsync("Remove item", $"Remove {row.Name}?", "Remove", "Cancel");
-        if (ok) await Vm.DeleteMealAsync(row.Item);
+        if (!ok) return;
+        var error = await Vm.DeleteMealAsync(row.Item);
+        if (error != null) await DisplayAlertAsync("Couldn't remove item", error, "OK");
     }
 
     private async void OnMealTapped(object? sender, TappedEventArgs e)
@@ -87,6 +88,7 @@ public partial class MealPlannerPage : ContentPage
         }
         meal.Name = newName.Trim();
         meal.Calories = cal;
-        await Vm.UpdateMealAsync(meal);
+        var error = await Vm.UpdateMealAsync(meal);
+        if (error != null) await DisplayAlertAsync("Couldn't save changes", error, "OK");
     }
 }

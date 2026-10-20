@@ -28,7 +28,7 @@ namespace RunWise.Services
         };
 
         // Fallback API key: use the key the user provided; prefer environment variable if set.
-        private const string FallbackApiKey = "fn_fcJXp6kq1G4ZqXQTmilmf2jTihhDmmyqyc1vvrMWgXM";
+        private const string FallbackApiKey = "";
 
         public CalorieApiService(HttpClient http)
         {

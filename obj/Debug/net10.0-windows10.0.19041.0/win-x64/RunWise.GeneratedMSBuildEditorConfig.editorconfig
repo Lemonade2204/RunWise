@@ -134,6 +134,16 @@ build_metadata.AdditionalFiles.NoWarn =
 build_metadata.AdditionalFiles.EnableDiagnostics = 
 build_metadata.AdditionalFiles.LineInfo = 
 
+[C:/Users/lemue/source/repos/RunWise/RunWise/Pages/LogFoodPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = RunWise.Pages.LogFoodPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Pages\LogFoodPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Pages\LogFoodPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
 [C:/Users/lemue/source/repos/RunWise/RunWise/Pages/LoginPage.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = RunWise.Pages.LoginPage.xaml
@@ -209,6 +219,26 @@ build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = RunWise.Pages.RunPage.xaml
 build_metadata.AdditionalFiles.TargetPath = Pages\RunPage.xaml
 build_metadata.AdditionalFiles.RelativePath = Pages\RunPage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/lemue/source/repos/RunWise/RunWise/Pages/StretchRoutinePage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = RunWise.Pages.StretchRoutinePage.xaml
+build_metadata.AdditionalFiles.TargetPath = Pages\StretchRoutinePage.xaml
+build_metadata.AdditionalFiles.RelativePath = Pages\StretchRoutinePage.xaml
+build_metadata.AdditionalFiles.Inflator = SourceGen
+build_metadata.AdditionalFiles.NoWarn = 
+build_metadata.AdditionalFiles.EnableDiagnostics = 
+build_metadata.AdditionalFiles.LineInfo = 
+
+[C:/Users/lemue/source/repos/RunWise/RunWise/Pages/StretchSessionPage.xaml]
+build_metadata.AdditionalFiles.GenKind = Xaml
+build_metadata.AdditionalFiles.ManifestResourceName = RunWise.Pages.StretchSessionPage.xaml
+build_metadata.AdditionalFiles.TargetPath = Pages\StretchSessionPage.xaml
+build_metadata.AdditionalFiles.RelativePath = Pages\StretchSessionPage.xaml
 build_metadata.AdditionalFiles.Inflator = SourceGen
 build_metadata.AdditionalFiles.NoWarn = 
 build_metadata.AdditionalFiles.EnableDiagnostics = 

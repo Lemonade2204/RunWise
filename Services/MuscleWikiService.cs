@@ -20,7 +20,7 @@ public class MuscleWikiService
         if (_http.BaseAddress == null) _http.BaseAddress = new Uri("https://api.musclewiki.com/");
 
 
-        _apiKey = Environment.GetEnvironmentVariable("MUSCLEWIKI_KEY") ?? "mw_wb_VftuiPnrWMmaFxRgS8NOeXZju34uw451mz-y1kWc" ;
+        _apiKey = Environment.GetEnvironmentVariable("MUSCLEWIKI_KEY") ;
     }
 
     // Videos removed per user request; do not expose video endpoints here.

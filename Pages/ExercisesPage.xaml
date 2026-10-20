@@ -6,12 +6,117 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     Title="Exercises">
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Color x:Key="StretchPrimary">#5B3CDD</Color>
+            <Color x:Key="StretchPrimaryDark">#4A2BCB</Color>
+            <Color x:Key="TextDark">#1B1B2F</Color>
+            <Color x:Key="TextMuted">#6E6E80</Color>
+
+            <Style x:Key="StretchCard" TargetType="Border">
+                <Setter Property="StrokeThickness" Value="0" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 16" />
+                <Setter Property="Padding" Value="20,18" />
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="{StaticResource StretchPrimary}" Offset="0" />
+                            <GradientStop Color="{StaticResource StretchPrimaryDark}" Offset="1" />
+                        </LinearGradientBrush>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Shadow">
+                    <Setter.Value>
+                        <Shadow Brush="#5B3CDD" Opacity="0.25" Radius="14" Offset="0,6" />
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="IconTile" TargetType="Border">
+                <Setter Property="WidthRequest" Value="44" />
+                <Setter Property="HeightRequest" Value="44" />
+                <Setter Property="StrokeThickness" Value="0" />
+                <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+                <Setter Property="BackgroundColor" Value="#33FFFFFF" />
+                <Setter Property="VerticalOptions" Value="Center" />
+            </Style>
+
+            <Style x:Key="CardIcon" TargetType="Path">
+                <Setter Property="WidthRequest" Value="20" />
+                <Setter Property="HeightRequest" Value="20" />
+                <Setter Property="Aspect" Value="Uniform" />
+                <Setter Property="HorizontalOptions" Value="Center" />
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="Stroke" Value="White" />
+                <Setter Property="StrokeThickness" Value="2" />
+                <Setter Property="StrokeLineCap" Value="Round" />
+                <Setter Property="StrokeLineJoin" Value="Round" />
+            </Style>
+
+            <Style x:Key="CardChevron" TargetType="Path">
+                <Setter Property="WidthRequest" Value="16" />
+                <Setter Property="HeightRequest" Value="16" />
+                <Setter Property="Aspect" Value="None" />
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="Stroke" Value="White" />
+                <Setter Property="StrokeThickness" Value="2" />
+                <Setter Property="StrokeLineCap" Value="Round" />
+                <Setter Property="StrokeLineJoin" Value="Round" />
+                <Setter Property="Data" Value="M6 3 L11 8 L6 13" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="White" Offset="0" />
+            <GradientStop Color="#F6F4FD" Offset="1" />
+        </LinearGradientBrush>
+    </ContentPage.Background>
+
     <ContentPage.Content>
-        <StackLayout Padding="24" Spacing="20" HorizontalOptions="Center" VerticalOptions="Center">
-            <Label Text="Exercises" FontSize="24" HorizontalOptions="Center" />
-            <Button Text="Pre Workout" Clicked="OnStartPreRunClicked" WidthRequest="220" HeightRequest="56" />
-            <Button Text="Post Workout" Clicked="OnStartPostRunClicked" WidthRequest="220" HeightRequest="56" />
-        </StackLayout>
+        <VerticalStackLayout Padding="20" Spacing="14" VerticalOptions="Center">
+            <Label Text="Stretch" FontSize="28" TextColor="{StaticResource TextDark}"
+                   HorizontalOptions="Center" />
+            <Label Text="When are you stretching?" FontSize="14" TextColor="{StaticResource TextMuted}"
+                   HorizontalOptions="Center" Margin="0,0,0,10" />
+
+            <!-- Pre run -->
+            <Border Style="{StaticResource StretchCard}">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnStartPreRunClicked" />
+                </Border.GestureRecognizers>
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14">
+                    <Border Style="{StaticResource IconTile}">
+                        <Path Style="{StaticResource CardIcon}"
+                              Data="M13 2 L4 14 H12 L11 22 L20 10 H12 Z" />
+                    </Border>
+                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                        <Label Text="Pre Run Stretch" FontFamily="OpenSansSemibold" FontSize="17" TextColor="White" />
+                        <Label Text="Dynamic warm-up · 3 levels" FontSize="12" TextColor="#DCD4FA" />
+                    </VerticalStackLayout>
+                    <Path Grid.Column="2" Style="{StaticResource CardChevron}" />
+                </Grid>
+            </Border>
+
+            <!-- Post run -->
+            <Border Style="{StaticResource StretchCard}">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnStartPostRunClicked" />
+                </Border.GestureRecognizers>
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="14">
+                    <Border Style="{StaticResource IconTile}">
+                        <Path Style="{StaticResource CardIcon}"
+                              Data="M21 12.8 A9 9 0 1 1 11.2 3 A7 7 0 0 0 21 12.8 Z" />
+                    </Border>
+                    <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                        <Label Text="Post Run Stretch" FontFamily="OpenSansSemibold" FontSize="17" TextColor="White" />
+                        <Label Text="Cooldown holds · 3 levels" FontSize="12" TextColor="#DCD4FA" />
+                    </VerticalStackLayout>
+                    <Path Grid.Column="2" Style="{StaticResource CardChevron}" />
+                </Grid>
+            </Border>
+        </VerticalStackLayout>
     </ContentPage.Content>
 
 </ContentPage>

@@ -36,7 +36,7 @@ namespace RunWise.ViewModels
         public int Servings => (int)Math.Max(1, Math.Round(Item.Quantity));
         public int TotalCalories => Item.Calories * Servings;
         public string Detail => !string.IsNullOrWhiteSpace(Item.Notes)
-            ? Item.Notes!
+            ? (Servings == 1 ? Item.Notes! : $"{Servings} × {Item.Notes}")
             : (Servings == 1 ? "1 serving" : $"{Servings} servings");
         public string CaloriesText => $"{TotalCalories:N0} kcal";
     }
@@ -220,18 +220,22 @@ namespace RunWise.ViewModels
             catch { }
         }
 
-        public async System.Threading.Tasks.Task DeleteMealAsync(MealItem meal)
+        // Returns an error message, or null on success
+        public async System.Threading.Tasks.Task<string?> DeleteMealAsync(MealItem meal)
         {
-            if (meal == null) return;
-            await _store.DeleteMealAsync(meal);
+            if (meal == null) return null;
+            var error = await _store.DeleteMealAsync(meal);
             await LoadForDateAsync(SelectedDate);
+            return error;
         }
 
-        public async System.Threading.Tasks.Task UpdateMealAsync(MealItem meal)
+        // Returns an error message, or null on success
+        public async System.Threading.Tasks.Task<string?> UpdateMealAsync(MealItem meal)
         {
-            if (meal == null) return;
-            await _store.UpdateMealAsync(meal);
+            if (meal == null) return null;
+            var error = await _store.UpdateMealAsync(meal);
             await LoadForDateAsync(SelectedDate);
+            return error;
         }
 
         private void NotifyGoalDerived()

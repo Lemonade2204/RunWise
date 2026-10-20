@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:RunWise.ViewModels"
+             x:Class="RunWise.Pages.StretchSessionPage"
+             x:DataType="vm:StretchSessionViewModel"
+             Shell.NavBarIsVisible="False"
+             Title="{Binding SessionTitle}"
+             BackgroundColor="White">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <Color x:Key="Accent">#5B3CDD</Color>
+            <Color x:Key="AccentDark">#4A2BCB</Color>
+            <Color x:Key="AccentSoft">#F1EEFC</Color>
+            <Color x:Key="PlayBlue">#4F6BF0</Color>
+            <Color x:Key="TextDark">#1B1B2F</Color>
+            <Color x:Key="TextMuted">#7A7A8C</Color>
+            <Color x:Key="CardStroke">#ECEAF4</Color>
+
+            <Style x:Key="ControlIcon" TargetType="Path">
+                <Setter Property="WidthRequest" Value="18" />
+                <Setter Property="HeightRequest" Value="18" />
+                <Setter Property="Aspect" Value="Uniform" />
+                <Setter Property="HorizontalOptions" Value="Center" />
+                <Setter Property="VerticalOptions" Value="Center" />
+                <Setter Property="StrokeThickness" Value="2" />
+                <Setter Property="StrokeLineCap" Value="Round" />
+                <Setter Property="StrokeLineJoin" Value="Round" />
+            </Style>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Padding="16,12,16,16" RowSpacing="10">
+
+        <!-- ============ HEADER ============ -->
+        <Grid ColumnDefinitions="Auto,*,Auto">
+            <Border WidthRequest="40" HeightRequest="40" StrokeThickness="0"
+                    StrokeShape="RoundRectangle 12" BackgroundColor="{StaticResource AccentSoft}">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnCloseTapped" />
+                </Border.GestureRecognizers>
+                <Path Data="M5 5 L15 15 M15 5 L5 15" WidthRequest="20" HeightRequest="20" Aspect="None"
+                      HorizontalOptions="Center" VerticalOptions="Center"
+                      Stroke="{StaticResource Accent}" StrokeThickness="2" StrokeLineCap="Round" />
+            </Border>
+            <Label Grid.Column="1" Text="{Binding SessionTitle}" FontSize="22" TextColor="{StaticResource TextDark}"
+                   HorizontalOptions="Center" VerticalOptions="Center" />
+            <Border Grid.Column="2" StrokeThickness="0" StrokeShape="RoundRectangle 14"
+                    BackgroundColor="{StaticResource AccentSoft}" Padding="12,6" VerticalOptions="Center">
+                <Label Text="{Binding Level}" FontFamily="OpenSansSemibold" FontSize="12"
+                       TextColor="{StaticResource AccentDark}" />
+            </Border>
+        </Grid>
+
+        <!-- ============ PROGRESS ============ -->
+        <Grid Grid.Row="1" x:Name="ProgressSegments" ColumnSpacing="6" HeightRequest="5" Margin="0,6,0,0" />
+        <Label Grid.Row="2" Text="{Binding MoveCounterText}" FontSize="12" TextColor="{StaticResource TextMuted}" />
+
+        <!-- ============ CURRENT MOVE ============ -->
+        <ScrollView Grid.Row="3">
+            <VerticalStackLayout Spacing="14" Padding="0,8,0,0">
+                <Grid WidthRequest="220" HeightRequest="220" HorizontalOptions="Center">
+                    <GraphicsView x:Name="Ring" />
+                    <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center" Spacing="0">
+                        <Label Text="{Binding TimeText}" FontFamily="OpenSansSemibold" FontSize="52"
+                               TextColor="{StaticResource TextDark}" HorizontalOptions="Center" />
+                        <Label Text="{Binding TimeCaption}" FontSize="13" TextColor="{StaticResource TextMuted}"
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                </Grid>
+
+                <VerticalStackLayout Spacing="2" Margin="0,8,0,0">
+                    <Label Text="{Binding Title}" FontFamily="OpenSansSemibold" FontSize="24"
+                           TextColor="{StaticResource TextDark}" HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" />
+                    <Label Text="{Binding Focus}" FontSize="13" TextColor="{StaticResource TextMuted}"
+                           HorizontalOptions="Center" HorizontalTextAlignment="Center" />
+                </VerticalStackLayout>
+
+                <Border StrokeThickness="0" StrokeShape="RoundRectangle 14"
+                        BackgroundColor="{StaticResource AccentSoft}" Padding="14,12">
+                    <Label Text="{Binding Instructions}" FontSize="13" TextColor="{StaticResource TextDark}" />
+                </Border>
+
+                <!-- Controls -->
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="26" Margin="0,6,0,0">
+                    <Border WidthRequest="50" HeightRequest="50" StrokeThickness="0" StrokeShape="RoundRectangle 25"
+                            BackgroundColor="{StaticResource AccentSoft}" VerticalOptions="Center">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnPreviousTapped" />
+                        </Border.GestureRecognizers>
+                        <Path Style="{StaticResource ControlIcon}" Stroke="{StaticResource Accent}"
+                              Data="M6 5 V19 M18 5 L9 12 L18 19 Z" />
+                    </Border>
+
+                    <Border WidthRequest="68" HeightRequest="68" StrokeThickness="0" StrokeShape="RoundRectangle 34"
+                            BackgroundColor="{StaticResource PlayBlue}" VerticalOptions="Center">
+                        <Border.Shadow>
+                            <Shadow Brush="#4F6BF0" Opacity="0.4" Radius="18" Offset="0,6" />
+                        </Border.Shadow>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnPlayPauseTapped" />
+                        </Border.GestureRecognizers>
+                        <Grid>
+                            <!-- Pause -->
+                            <Path Style="{StaticResource ControlIcon}" Stroke="White"
+                                  Data="M9 5 V19 M15 5 V19" IsVisible="{Binding IsRunning}" />
+                            <!-- Play -->
+                            <Path Style="{StaticResource ControlIcon}" Stroke="White" Fill="White"
+                                  Data="M8 5 L19 12 L8 19 Z" Margin="3,0,0,0">
+                                <Path.Triggers>
+                                    <DataTrigger TargetType="Path" Binding="{Binding IsRunning}" Value="True">
+                                        <Setter Property="IsVisible" Value="False" />
+                                    </DataTrigger>
+                                </Path.Triggers>
+                            </Path>
+                        </Grid>
+                    </Border>
+
+                    <Border WidthRequest="50" HeightRequest="50" StrokeThickness="0" StrokeShape="RoundRectangle 25"
+                            BackgroundColor="{StaticResource AccentSoft}" VerticalOptions="Center">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnNextTapped" />
+                        </Border.GestureRecognizers>
+                        <Path Style="{StaticResource ControlIcon}" Stroke="{StaticResource Accent}"
+                              Data="M18 5 V19 M6 5 L15 12 L6 19 Z" />
+                    </Border>
+                </HorizontalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- ============ UP NEXT ============ -->
+        <Border Grid.Row="4" StrokeThickness="1" Stroke="{StaticResource CardStroke}" BackgroundColor="White"
+                StrokeShape="RoundRectangle 14" Padding="14,10">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                <VerticalStackLayout Spacing="0" VerticalOptions="Center">
+                    <Label Text="{Binding UpNextLabel}" FontSize="11" CharacterSpacing="1"
+                           TextColor="{StaticResource TextMuted}" />
+                    <Label Text="{Binding UpNextTitle}" FontFamily="OpenSansSemibold" FontSize="15"
+                           TextColor="{StaticResource TextDark}" />
+                </VerticalStackLayout>
+                <Border Grid.Column="1" StrokeThickness="0" StrokeShape="RoundRectangle 10"
+                        BackgroundColor="{StaticResource AccentSoft}" Padding="10,6" VerticalOptions="Center"
+                        IsVisible="{Binding HasNext}">
+                    <Label Text="{Binding UpNextAmount}" FontFamily="OpenSansSemibold" FontSize="12"
+                           TextColor="{StaticResource AccentDark}" />
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+
+</ContentPage>
